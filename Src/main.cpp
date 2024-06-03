@@ -1,5 +1,5 @@
 #include <SDL2/SDL.h>
-#include "Board.cpp"
+#include "../Include/Board.h"
 
 void Clean(SDL_Window* window, SDL_Renderer* renderer);
 void DrawBoard(Board* board, SDL_Renderer* renderer);
@@ -12,31 +12,38 @@ int window_height = 400;
 SDL_Color lightSquareColor = {255, 255, 255, 255};
 SDL_Color darkSquareColor = {0, 0, 0, 255};
 
+Board* b;
+
 
 int main(int argc, char* argv[]){
-    SDL_Init(SDL_INIT_EVERYTHING);
+	// Initialize and Create everything
 
-    SDL_Window* window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_SHOWN);
+	SDL_Init(SDL_INIT_EVERYTHING);
 
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
-    
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_Window* window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_SHOWN);
 
-    SDL_RenderClear(renderer);
+	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
-    Board* b = new Board();
 
-    printf("%d", b->width);
+	b = new Board();
 
-    DrawBoard(b, renderer);
+	
 
-    SDL_RenderPresent(renderer);
+	SDL_RenderClear(renderer);
 
-    SDL_Delay(2000);
+	DrawBoard(b, renderer);
 
-    Clean(window, renderer);
+	SDL_RenderPresent(renderer);
 
-    return 0;
+
+	// Clean everything up
+
+	Clean(window, renderer);
+
+	delete b;
+
+
+	return 0;
 }
 
 
@@ -57,18 +64,17 @@ void DrawBoard(Board* board, SDL_Renderer* renderer){
 	r.w = squareWidth;
 	r.h = squareHeight;
 
-	for (int i; i < board->width; i++){
-		for (int j; j < board->height; j++){
-			if ((i+j) % 2 == 0){ squareColor = lightSquareColor; }
+	for (int i = 0; i < board->width; i++){
+		for (int j = 0; j < board->height; j++){
+
+			if ((i+j) % 2 == 0){ squareColor = lightSquareColor; } // Set the color of the square
 			else{ squareColor = darkSquareColor; }
 
-			r.x = i * squareWidth;
+			r.x = i * squareWidth; // Set the position of the square
 			r.y = j * squareHeight;
 
-			SDL_SetRenderDrawColor(renderer, squareColor.r, squareColor.g, squareColor.b, squareColor.a);
+			SDL_SetRenderDrawColor(renderer, squareColor.r, squareColor.g, squareColor.b, squareColor.a); // Draw the square
 			SDL_RenderFillRect(renderer, &r);
-
-			printf("Here");
 		}
 	}
 }
