@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "Piece.h"
+#include "Includes/Piece.h"
 
 
 Piece::Piece(int piecetype, int color){
@@ -7,3 +7,7 @@ Piece::Piece(int piecetype, int color){
 }
 
 Piece::~Piece(){}
+
+int Piece::GetPieceID(){
+	return ID;
+}

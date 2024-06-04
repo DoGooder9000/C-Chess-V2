@@ -1,7 +1,8 @@
 #pragma once
 
 #include <stdio.h>
-#include "Piece.cpp"
+
+class Piece;
 
 class Piece{
 	public:
@@ -18,6 +19,8 @@ class Piece{
 
 		Piece(int piecetype, int color);
 		~Piece();
+
+		int GetPieceID();
 
 	private:
 		int ID;	

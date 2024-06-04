@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
-#include "Board.h"
+#include <SDL2/SDL_image.h>
+#include "Includes/Board.h"
 
 void Clean(SDL_Window* window, SDL_Renderer* renderer);
 void DrawBoard(Board* board, SDL_Renderer* renderer);
@@ -14,6 +15,20 @@ SDL_Color darkSquareColor = {0, 0, 0, 255};
 
 Board* currentBoard;
 
+
+SDL_Surface* WhitePawnImg = IMG_Load("Img/whitepawn.png");
+SDL_Surface* WhiteKnightImg = IMG_Load("Img/whiteknight.png");
+SDL_Surface* WhiteBishopImg = IMG_Load("Img/whitebishop.png");
+SDL_Surface* WhiteRookImg = IMG_Load("Img/whiterook.png");
+SDL_Surface* WhiteQueenImg = IMG_Load("Img/whitequeen.png");
+SDL_Surface* WhiteKingImg = IMG_Load("Img/whiteking.png");
+
+SDL_Surface* BlackPawnImg = IMG_Load("Img/blackpawn.png");
+SDL_Surface* BlackKnightImg = IMG_Load("Img/blackknight.png");
+SDL_Surface* BlackBishopImg = IMG_Load("Img/blackbishop.png");
+SDL_Surface* BlackRookImg = IMG_Load("Img/blackrook.png");
+SDL_Surface* BlackQueenImg = IMG_Load("Img/blackqueen.png");
+SDL_Surface* BlackKingImg = IMG_Load("Img/blackking.png");
 
 int main(int argc, char* argv[]){
 	// Initialize and Create everything
@@ -96,4 +111,8 @@ void DrawBoard(Board* board, SDL_Renderer* renderer){
 			SDL_RenderFillRect(renderer, &r);
 		}
 	}
+}
+
+void DrawPieces(Board* board, SDL_Renderer* renderer){
+	;
 }
