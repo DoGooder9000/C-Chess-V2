@@ -12,7 +12,7 @@ int window_height = 400;
 SDL_Color lightSquareColor = {255, 255, 255, 255};
 SDL_Color darkSquareColor = {0, 0, 0, 255};
 
-Board* b;
+Board* currentBoard;
 
 
 int main(int argc, char* argv[]){
@@ -25,33 +25,52 @@ int main(int argc, char* argv[]){
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
 
-	b = new Board();
+	currentBoard = new Board();
 
-	
+	// Make a event variable to read into 
+	SDL_Event event;
 
-	SDL_RenderClear(renderer);
+	while (true){
+		// Get events
+		if (SDL_PollEvent(&event)){
+			// Decide what to do with each event type
+			
+			if (event.type == SDL_QUIT){ // If the user closes the window
+				break; // Break out of the while loop
+			}
+		}
+		
 
-	DrawBoard(b, renderer);
+		SDL_RenderClear(renderer); 	// Clear the Renderer 
 
-	SDL_RenderPresent(renderer);
+						// Do all of the drawing functions
+
+		DrawBoard(currentBoard, renderer); 	// Draw the board
+
+						
+
+		SDL_RenderPresent(renderer);	// Show the final render
+
+	}
+
+	// The main loop exits. Clean everything up
+
+	// Clean up SDL2
+
+	Clean(window, renderer); 	// Delete the window and renderer
+	SDL_Quit();			// Quit SDL2
 
 
-	// Clean everything up
-
-	Clean(window, renderer);
-
-	delete b;
+	delete currentBoard;		// Delete the board pointer
 
 
-	return 0;
+	return 0; 			// Exit
 }
 
 
 void Clean(SDL_Window* window, SDL_Renderer* renderer){
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
-
-	SDL_Quit();
 }
 
 void DrawBoard(Board* board, SDL_Renderer* renderer){
