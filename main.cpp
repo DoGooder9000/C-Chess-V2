@@ -1,5 +1,5 @@
 #include <SDL2/SDL.h>
-#include "../Include/Board.h"
+#include "Board.h"
 
 void Clean(SDL_Window* window, SDL_Renderer* renderer);
 void DrawBoard(Board* board, SDL_Renderer* renderer);

@@ -1,5 +1,5 @@
 #pragma once
 
-#include "../Src/Board.cpp"
+#include "Board.cpp"
 
 class Board;
