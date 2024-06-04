@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <cmath>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -11,11 +12,11 @@ void DrawPieces(Board* board, SDL_Texture** PieceTextures, SDL_Renderer* rendere
 
 
 const char* window_title = "Chess C++";
-const int window_width = 400;
-const int window_height = 400;
+const int window_width = 500;
+const int window_height = 500;
 
-const int squareWidth = window_width/8;
-const int squareHeight = window_height/8;
+const float squareWidth = (float)window_width/(float)8;
+const float squareHeight = (float)window_height/(float)8;
 
 SDL_Color lightSquareColor = {255, 255, 255, 255};
 SDL_Color darkSquareColor = {0, 0, 0, 255};
@@ -145,8 +146,8 @@ void DrawBoard(Board* board, SDL_Renderer* renderer){
 			if ((i+j) % 2 == 0){ squareColor = lightSquareColor; } // Set the color of the square
 			else{ squareColor = darkSquareColor; }
 
-			r.x = i * squareWidth; // Set the position of the square
-			r.y = j * squareHeight;
+			r.x = round(i * squareWidth); // Set the position of the square
+			r.y = round(j * squareHeight);
 
 			SDL_SetRenderDrawColor(renderer, squareColor.r, squareColor.g, squareColor.b, squareColor.a); // Draw the square
 			SDL_RenderFillRect(renderer, &r);
