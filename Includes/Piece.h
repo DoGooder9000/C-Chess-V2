@@ -14,8 +14,8 @@ class Piece{
 		const static int Queen = 5;
 		const static int King = 6;
 		
-		const static int White = 8;
-		const static int Black = 16;
+		const static int White = 0;
+		const static int Black = 8;
 
 		Piece(int piecetype, int color);
 		~Piece();
