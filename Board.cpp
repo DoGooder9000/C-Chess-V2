@@ -169,8 +169,9 @@ int Board::IndexFromBoardPos(std::tuple<int, int> BoardPos){
 	return y*width+x;
 }
 
-void Board::MovePiece(Move move){
-	squares[move.target_index] = *(move.piece);
+void Board:: MovePiece(Move move){
+	squares[move.target_index] = *move.piece;
+
 	squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index);
 
 	move.piece->Move(move.target_index);

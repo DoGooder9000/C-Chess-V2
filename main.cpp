@@ -81,6 +81,7 @@ int main(int argc, char* argv[]){
 
 
 	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR\0");
+	currentPiece = nullptr;
 	
 	// Make a event variable to read into 
 	SDL_Event event;
@@ -102,7 +103,11 @@ int main(int argc, char* argv[]){
 				{
 				case SDL_BUTTON_LEFT:
 					
-					currentPiece = GetPieceClicked(currentBoard, event.motion.x, event.motion.y);
+					currentPiece  = GetPieceClicked(currentBoard, event.motion.x, event.motion.y);
+
+					if (currentPiece->piecetype == Piece::None){
+						currentPiece == nullptr;
+					}
 
 					break;
 				
@@ -118,10 +123,13 @@ int main(int argc, char* argv[]){
 				{
 				case SDL_BUTTON_LEFT:
 					
-					if (currentPiece->piecetype != 0){
+					if (currentPiece != nullptr && currentPiece->piecetype != Piece::None){
+
 						Move move(currentPiece->index, GetIndexClicked(currentBoard, event.motion.x, event.motion.y), currentPiece);
 
 						currentBoard->MovePiece(move);
+
+						currentPiece == nullptr;
 					}
 
 					break;
@@ -143,7 +151,6 @@ int main(int argc, char* argv[]){
 		DrawBoard(currentBoard, renderer); 					// Draw the board
 
 		DrawPieces(currentBoard, PieceTextures, renderer);	// Draw the pieces on the board
-		printf("here");
 
 		SDL_RenderPresent(renderer);						// Show the final render
 
@@ -218,7 +225,11 @@ void DrawPieces(Board* board, SDL_Texture** PieceTextures, SDL_Renderer* rendere
 }
 
 int GetIndexClicked(Board* board, int mouseX, int mouseY){
-	return board->IndexFromBoardPos(std::make_tuple(mouseX/(int)squareWidth, mouseY/(int)squareHeight));
+	int col = mouseX / squareWidth;
+    int row = mouseY / squareHeight;
+    int index = board->IndexFromBoardPos(std::make_tuple(col, row));
+
+	return index;
 }
 
 Piece* GetPieceClicked(Board* board, int mouseX, int mouseY){
