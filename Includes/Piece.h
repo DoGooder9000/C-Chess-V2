@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-class Piece;
 
 class Piece{
 	public:
@@ -17,7 +16,13 @@ class Piece{
 		const static int White = 0;
 		const static int Black = 8;
 
-		Piece(int piecetype, int color);
+		int piecetype;
+		int color;
+
+		int index;
+
+		Piece();
+		Piece(int piecetype, int color, int index);
 		~Piece();
 
 		int GetPieceID();

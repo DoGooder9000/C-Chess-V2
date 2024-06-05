@@ -4,11 +4,15 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "Includes/Board.h"
+#include "Includes/Move.h"
 
 void Clean(SDL_Window* window, SDL_Renderer* renderer);
 void DestroyPieceTextures(SDL_Texture** PieceTextures);
 void DrawBoard(Board* board, SDL_Renderer* renderer);
 void DrawPieces(Board* board, SDL_Texture** PieceTextures, SDL_Renderer* renderer);
+Piece* GetPieceClicked(Board* board, int mouseX, int mouseY);
+int GetIndexClicked(Board* board, int mouseX, int mouseY);
+void MovePiece(Board* board, Piece* piece, Move move);
 
 
 const char* window_title = "Chess C++";
@@ -22,6 +26,7 @@ SDL_Color lightSquareColor = {209, 163, 113, 255};
 SDL_Color darkSquareColor = {128, 100, 70, 255};
 
 Board* currentBoard;
+Piece* currentPiece;
 
 SDL_Surface* img = nullptr;
 
@@ -77,16 +82,57 @@ int main(int argc, char* argv[]){
 
 
 	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR\0");
+	
 	// Make a event variable to read into 
 	SDL_Event event;
+	bool running = true;
 
-	while (true){
+	while (running){
 		// Get events
 		if (SDL_PollEvent(&event)){
 			// Decide what to do with each event type
+			switch (event.type)
+			{
+			case SDL_QUIT:
+				running = false;
+				break;
 			
-			if (event.type == SDL_QUIT){ // If the user closes the window
-				break; // Break out of the while loop
+			case SDL_MOUSEBUTTONDOWN:
+				
+				switch (event.button.button)
+				{
+				case SDL_BUTTON_LEFT:
+					
+					currentPiece = GetPieceClicked(currentBoard, event.motion.x, event.motion.y);
+
+					break;
+				
+				default:
+					break;
+				}
+
+				break;
+			
+			case SDL_MOUSEBUTTONUP:
+				
+				switch (event.button.button)
+				{
+				case SDL_BUTTON_LEFT:
+					
+					if (currentPiece->piecetype != 0){
+						Move move(currentPiece->index, GetIndexClicked(currentBoard, event.motion.x, event.motion.y), currentPiece);
+
+						MovePiece(currentBoard, currentPiece, move);
+					}
+
+					break;
+				
+				default:
+					break;
+				}
+			
+			default:
+				break;
 			}
 		}
 		
@@ -160,13 +206,25 @@ void DrawPieces(Board* board, SDL_Texture** PieceTextures, SDL_Renderer* rendere
 	destRect.h = squareHeight;
 
 	for (int i=0; i < board->size; i++){
-		if (board->squares[i] == Piece::None){continue;}
+		if (board->squares[i].piecetype == Piece::None){continue;}
 
 		std::tie(destRect.x, destRect.y) = board->BoardPosFromIndex(i);
 
 		destRect.x *= squareWidth;
 		destRect.y *= squareHeight;
 
-		SDL_RenderCopy(renderer, PieceTextures[board->squares[i]], NULL, &destRect);
+		SDL_RenderCopy(renderer, PieceTextures[board->squares[i].piecetype], NULL, &destRect);
 	}
 }
+
+int GetIndexClicked(Board* board, int mouseX, int mouseY){
+	return board->IndexFromBoardPos(std::make_tuple(mouseX/(int)squareWidth, mouseY/(int)squareHeight));
+}
+
+Piece* GetPieceClicked(Board* board, int mouseX, int mouseY){
+	int index = GetIndexClicked(board, mouseX, mouseY);
+
+	return &(board->squares[index]);
+}
+
+void MovePiece(Board* board, Piece* piece, Move move){}

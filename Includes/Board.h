@@ -4,6 +4,8 @@
 #include <tuple>
 #include "Piece.h"
 
+class Board;
+
 class Board{
 	public:
 		const static int width = 8;
@@ -12,10 +14,11 @@ class Board{
 
 		int color = 0;
 
-		int squares[size];
+		Piece squares[size];
 
 		Board(const char* FEN_String);
 		~Board();
 
 		std::tuple<int, int> BoardPosFromIndex(int index);
+		int IndexFromBoardPos(std::tuple<int, int> BoardPos);
 };
