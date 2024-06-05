@@ -16,5 +16,4 @@ int Piece::GetPieceID(){
 
 void Piece::Move(int new_index){
 	index = new_index;
-	printf("Updated Index is %d\n", index);
 }

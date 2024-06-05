@@ -1,12 +1,17 @@
 #include <stdio.h>
-#include <cstdint>
 
 #include "Includes/Board.h"
 #include "Includes/Piece.h"
 
-typedef uint64_t Bitboard;
-
 Board::Board(const char* FEN_String){
+	GetBoardFromFEN(FEN_String);
+
+	GenerateBitboards();
+}
+
+Board::~Board(){}
+
+void Board::GetBoardFromFEN(const char* FEN_String){
 	int fen_index = 0;
 	int square_index = 0;
 
@@ -158,8 +163,6 @@ Board::Board(const char* FEN_String){
 	}
 }
 
-Board::~Board(){}
-
 std::tuple<int, int> Board::BoardPosFromIndex(int index){
 	return std::make_tuple(index % width, index / width);
 }
@@ -173,13 +176,53 @@ int Board::IndexFromBoardPos(std::tuple<int, int> BoardPos){
 }
 
 void Board::MovePiece(Move move){
-	printf("start: %d target: %d piece: %d\n", move.start_index, move.target_index, move.piece->piecetype);
-
 	squares[move.target_index] = *move.piece; // Set the target position on the board to the piece
 
 	squares[move.target_index].Move(move.target_index);
 
-	//move.piece->Move(move.target_index); // Move the piece internal (inside itself)
-
 	squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to black
+
+	GenerateBitboard(move.piece->GetPieceID());
+}
+
+void Board::GenerateBitboards(){
+
+	for (int i=0; i<2; i++){
+		for (int j=0; j<6; j++){
+			bitboards[i][j] = 0ULL;
+
+			for (int k=0; k<size; k++){
+				if (squares[k].GetPieceID() == (i*8)+(j+1)){ // j+1 is neccesary because the Pawn ID starts at 1. 0 means type None
+					bitboards[i][j] |= (1ULL << k);
+				}
+			}
+		}
+	}
+}
+
+Bitboard Board::GenerateBitboard(int PieceID){
+	Bitboard bitboard = 0ULL;
+
+	for (int k=0; k<size; k++){
+		if (squares[k].GetPieceID() == PieceID){ // j+1 is neccesary because the Pawn ID starts at 1. 0 means type None
+			bitboard |= (1ULL << k);
+		}
+	}
+
+	return bitboard;
+}
+
+void Board::PrintBitboard(Bitboard bitboard){
+	int index;
+
+	for (int i=0; i<8; i++){
+		for (int j=0; j<8; j++){
+			index = i*8 + j;
+
+			if (bitboard & (1ULL << index)){printf("1 ");}
+			else{printf(". ");}
+		}
+		printf("\n");
+	}
+	printf("\n");
 }

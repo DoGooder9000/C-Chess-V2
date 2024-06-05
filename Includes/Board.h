@@ -4,6 +4,7 @@
 #include <tuple>
 #include "Piece.h"
 #include "Move.h"
+#include "Globals.h"
 
 class Board;
 
@@ -17,6 +18,8 @@ class Board{
 
 		Piece squares[size];
 
+		Bitboard bitboards[2][6]; // 2 Colors 6 types of pieces
+
 		Board(const char* FEN_String);
 		~Board();
 
@@ -24,4 +27,10 @@ class Board{
 		int IndexFromBoardPos(std::tuple<int, int> BoardPos);
 
 		void MovePiece(Move move);
+
+		void GenerateBitboards();
+		Bitboard GenerateBitboard(int PieceID);
+		void PrintBitboard(Bitboard bitboard);
+
+		void GetBoardFromFEN(const char* FEN_String);
 };
