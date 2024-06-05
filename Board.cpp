@@ -183,6 +183,10 @@ void Board::MovePiece(Move move){
 	squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to black
 
 	GenerateBitboard(move.piece->GetPieceID());
+
+	if (squares[move.target_index].piecetype != Piece::None){
+		GenerateBitboard(squares[move.target_index].GetPieceID());
+	}
 }
 
 void Board::GenerateBitboards(){
