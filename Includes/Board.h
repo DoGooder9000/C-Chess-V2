@@ -14,7 +14,7 @@ class Board{
 
 		int squares[size];
 
-		Board();
+		Board(const char* FEN_String);
 		~Board();
 
 		std::tuple<int, int> BoardPosFromIndex(int index);

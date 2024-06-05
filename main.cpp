@@ -18,8 +18,8 @@ const int window_height = 500;
 const float squareWidth = (float)window_width/(float)8;
 const float squareHeight = (float)window_height/(float)8;
 
-SDL_Color lightSquareColor = {255, 255, 255, 255};
-SDL_Color darkSquareColor = {0, 0, 0, 255};
+SDL_Color lightSquareColor = {209, 163, 113, 255};
+SDL_Color darkSquareColor = {128, 100, 70, 255};
 
 Board* currentBoard;
 
@@ -76,8 +76,7 @@ int main(int argc, char* argv[]){
 	SDL_FreeSurface(img);
 
 
-	currentBoard = new Board();
-
+	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR\0");
 	// Make a event variable to read into 
 	SDL_Event event;
 
