@@ -1,7 +1,10 @@
 #include <stdio.h>
+#include <cstdint>
 
 #include "Includes/Board.h"
 #include "Includes/Piece.h"
+
+typedef uint64_t Bitboard;
 
 Board::Board(const char* FEN_String){
 	int fen_index = 0;
@@ -169,10 +172,14 @@ int Board::IndexFromBoardPos(std::tuple<int, int> BoardPos){
 	return y*width+x;
 }
 
-void Board:: MovePiece(Move move){
-	squares[move.target_index] = *move.piece;
+void Board::MovePiece(Move move){
+	printf("start: %d target: %d piece: %d\n", move.start_index, move.target_index, move.piece->piecetype);
 
-	squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index);
+	squares[move.target_index] = *move.piece; // Set the target position on the board to the piece
 
-	move.piece->Move(move.target_index);
+	squares[move.target_index].Move(move.target_index);
+
+	//move.piece->Move(move.target_index); // Move the piece internal (inside itself)
+
+	squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to black
 }

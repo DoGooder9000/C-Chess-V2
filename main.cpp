@@ -13,7 +13,6 @@ void DrawPieces(Board* board, SDL_Texture** PieceTextures, SDL_Renderer* rendere
 Piece* GetPieceClicked(Board* board, int mouseX, int mouseY);
 int GetIndexClicked(Board* board, int mouseX, int mouseY);
 
-
 const char* window_title = "Chess C++";
 const int window_width = 500;
 const int window_height = 500;
@@ -80,7 +79,7 @@ int main(int argc, char* argv[]){
 	SDL_FreeSurface(img);
 
 
-	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR\0");
+	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 	currentPiece = nullptr;
 	
 	// Make a event variable to read into 
@@ -106,7 +105,7 @@ int main(int argc, char* argv[]){
 					currentPiece  = GetPieceClicked(currentBoard, event.motion.x, event.motion.y);
 
 					if (currentPiece->piecetype == Piece::None){
-						currentPiece == nullptr;
+						currentPiece = nullptr;
 					}
 
 					break;
@@ -124,12 +123,14 @@ int main(int argc, char* argv[]){
 				case SDL_BUTTON_LEFT:
 					
 					if (currentPiece != nullptr && currentPiece->piecetype != Piece::None){
+						int target_index = GetIndexClicked(currentBoard, event.motion.x, event.motion.y);
 
-						Move move(currentPiece->index, GetIndexClicked(currentBoard, event.motion.x, event.motion.y), currentPiece);
-
-						currentBoard->MovePiece(move);
-
-						currentPiece == nullptr;
+						if (target_index != currentPiece->index){
+							Move move(currentPiece->index, target_index, currentPiece);
+						
+							currentBoard->MovePiece(move);
+						}
+						currentPiece = nullptr;
 					}
 
 					break;
