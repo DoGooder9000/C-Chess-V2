@@ -23,3 +23,7 @@ Piece::~Piece(){}
 int Piece::GetPieceID(){
 	return ID;
 }
+
+void Piece::Move(int new_index){
+	index = new_index;
+}

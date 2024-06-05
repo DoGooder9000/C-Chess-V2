@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <tuple>
 #include "Piece.h"
+#include "Move.h"
 
 class Board;
 
@@ -21,4 +22,6 @@ class Board{
 
 		std::tuple<int, int> BoardPosFromIndex(int index);
 		int IndexFromBoardPos(std::tuple<int, int> BoardPos);
+
+		void MovePiece(Move move);
 };

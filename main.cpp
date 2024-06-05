@@ -12,7 +12,6 @@ void DrawBoard(Board* board, SDL_Renderer* renderer);
 void DrawPieces(Board* board, SDL_Texture** PieceTextures, SDL_Renderer* renderer);
 Piece* GetPieceClicked(Board* board, int mouseX, int mouseY);
 int GetIndexClicked(Board* board, int mouseX, int mouseY);
-void MovePiece(Board* board, Piece* piece, Move move);
 
 
 const char* window_title = "Chess C++";
@@ -122,7 +121,7 @@ int main(int argc, char* argv[]){
 					if (currentPiece->piecetype != 0){
 						Move move(currentPiece->index, GetIndexClicked(currentBoard, event.motion.x, event.motion.y), currentPiece);
 
-						MovePiece(currentBoard, currentPiece, move);
+						currentBoard->MovePiece(move);
 					}
 
 					break;
@@ -144,6 +143,7 @@ int main(int argc, char* argv[]){
 		DrawBoard(currentBoard, renderer); 					// Draw the board
 
 		DrawPieces(currentBoard, PieceTextures, renderer);	// Draw the pieces on the board
+		printf("here");
 
 		SDL_RenderPresent(renderer);						// Show the final render
 
@@ -213,7 +213,7 @@ void DrawPieces(Board* board, SDL_Texture** PieceTextures, SDL_Renderer* rendere
 		destRect.x *= squareWidth;
 		destRect.y *= squareHeight;
 
-		SDL_RenderCopy(renderer, PieceTextures[board->squares[i].piecetype], NULL, &destRect);
+		SDL_RenderCopy(renderer, PieceTextures[board->squares[i].GetPieceID()], NULL, &destRect);
 	}
 }
 
@@ -226,5 +226,3 @@ Piece* GetPieceClicked(Board* board, int mouseX, int mouseY){
 
 	return &(board->squares[index]);
 }
-
-void MovePiece(Board* board, Piece* piece, Move move){}

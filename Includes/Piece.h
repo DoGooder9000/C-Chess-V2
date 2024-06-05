@@ -26,6 +26,7 @@ class Piece{
 		~Piece();
 
 		int GetPieceID();
+		void Move(int new_index);
 
 	private:
 		int ID;	
