@@ -1,6 +1,6 @@
 Compiler = g++
 
-SDL2_LINUX_FLAGS = -lSDL2
+SDL2_LINUX_FLAGS = -lSDL2 -lSDL2_image
 SDL2_WINDOWS_FLAGS = -lmingw32 -lSDL2main -lSDL2_image -lSDL2
 
 target_file_linux = Chess
