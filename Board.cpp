@@ -8,6 +8,7 @@ Board::Board(const char* FEN_String){
 	GetBoardFromFEN(FEN_String);
 
 	GenerateBitboards();
+	GenerateColorBitboards();
 }
 
 Board::~Board(){}
@@ -177,14 +178,17 @@ int Board::IndexFromBoardPos(std::tuple<int, int> BoardPos){
 }
 
 void Board::MovePiece(Move move){
-	std::array<int, 64> LegalMoves = move.piece->GetLegalMoves(this); // returns a list of indexes of moves
+	Bitboard LegalMoves = move.piece->GetLegalMoves(this); // returns a list of indexes of moves
 
-	if (std::find(std::begin(LegalMoves), std::end(LegalMoves), move.target_index) != std::end(LegalMoves)){ // If move is in legal moves
+	if ((LegalMoves & (1ULL << move.target_index)) > 0){ // If move is in legal moves
 		HistoryIndex++;
 
 		History[HistoryIndex].color = color;
 		History[HistoryIndex].squares = squares;
 		History[HistoryIndex].castleRights = castleRights;
+		History[HistoryIndex].bitboards[0] = bitboards[0];
+		History[HistoryIndex].bitboards[1] = bitboards[1];
+		History[HistoryIndex].colorBitboards = colorBitboards;
 
 		// We need to save the position before we do the move
 
@@ -199,6 +203,7 @@ void Board::MovePiece(Move move){
 		if (squares[move.target_index].piecetype != Piece::None){
 			GenerateBitboard(squares[move.target_index].GetPieceID());
 		}
+		GenerateColorBitboards();
 	}
 }
 
@@ -212,6 +217,22 @@ void Board::GenerateBitboards(){
 				if (squares[k].GetPieceID() == (i*8)+(j+1)){ // j+1 is neccesary because the Pawn ID starts at 1. 0 means type None
 					bitboards[i][j] |= (1ULL << k);
 				}
+			}
+		}
+	}
+}
+
+void Board::GenerateColorBitboards(){
+	colorBitboards[0] = 0ULL;
+	colorBitboards[1] = 0ULL;
+
+	for (int k=0; k<size; k++){
+		if (squares[k].piecetype != Piece::None){
+			if (squares[k].color == Piece::White){ // j+1 is neccesary because the Pawn ID starts at 1. 0 means type None
+				colorBitboards[0] |= (1ULL << k);
+			}
+			else{
+				colorBitboards[1] |= (1ULL << k);
 			}
 		}
 	}
@@ -249,6 +270,12 @@ void Board::UndoBoardMove(){
 		squares = History[HistoryIndex].squares;
 		color = History[HistoryIndex].color;
 		castleRights = History[HistoryIndex].castleRights;
+
+		// Instead of saving the bitboards, you could just regenereate them, but that would take time.
+
+		bitboards[0] = History[HistoryIndex].bitboards[0];
+		bitboards[1] = History[HistoryIndex].bitboards[1];
+		colorBitboards = History[HistoryIndex].colorBitboards;
 
 
 		History[HistoryIndex] = UndoMove();

@@ -10,18 +10,20 @@ void Clean(SDL_Window* window, SDL_Renderer* renderer);
 void DestroyPieceTextures(SDL_Texture** PieceTextures);
 void DrawBoard(Board* board, SDL_Renderer* renderer);
 void DrawPieces(Board* board, SDL_Texture** PieceTextures, SDL_Renderer* renderer);
+void DrawBitboard(Bitboard bitboard, SDL_Color color, SDL_Renderer* renderer);
 Piece* GetPieceClicked(Board* board, int mouseX, int mouseY);
 int GetIndexClicked(Board* board, int mouseX, int mouseY);
 
 const char* window_title = "Chess C++";
-const int window_width = 500;
-const int window_height = 500;
+const int window_width = 400;
+const int window_height = 400;
 
 const float squareWidth = (float)window_width/(float)8;
 const float squareHeight = (float)window_height/(float)8;
 
 SDL_Color lightSquareColor = {209, 163, 113, 255};
 SDL_Color darkSquareColor = {128, 100, 70, 255};
+SDL_Color legalMoveColor = {245, 211, 61, 255};
 
 Board* currentBoard;
 Piece* currentPiece;
@@ -162,6 +164,9 @@ int main(int argc, char* argv[]){
 
 		DrawBoard(currentBoard, renderer); 					// Draw the board
 
+		if (currentPiece != nullptr){
+			DrawBitboard(currentPiece->GetLegalMoves(currentBoard), legalMoveColor, renderer);
+		}
 		DrawPieces(currentBoard, PieceTextures, renderer);	// Draw the pieces on the board
 
 		SDL_RenderPresent(renderer);						// Show the final render
@@ -210,8 +215,8 @@ void DrawBoard(Board* board, SDL_Renderer* renderer){
 			if ((i+j) % 2 == 0){ squareColor = lightSquareColor; } // Set the color of the square
 			else{ squareColor = darkSquareColor; }
 
-			r.x = round(i * squareWidth); // Set the position of the square
-			r.y = round(j * squareHeight);
+			r.x = ceil(i * squareWidth); // Set the position of the square
+			r.y = ceil(j * squareHeight);
 
 			SDL_SetRenderDrawColor(renderer, squareColor.r, squareColor.g, squareColor.b, squareColor.a); // Draw the square
 			SDL_RenderFillRect(renderer, &r);
@@ -233,6 +238,25 @@ void DrawPieces(Board* board, SDL_Texture** PieceTextures, SDL_Renderer* rendere
 		destRect.y *= squareHeight;
 
 		SDL_RenderCopy(renderer, PieceTextures[board->squares[i].GetPieceID()], NULL, &destRect);
+	}
+}
+
+void DrawBitboard(Bitboard bitboard, SDL_Color color, SDL_Renderer* renderer){
+	SDL_Rect r;
+	r.w = squareWidth;
+	r.h = squareHeight;
+
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+
+	for (int i=0; i<64; i++){
+		if ((bitboard & (1ULL << i)) > 1){
+			std::tie(r.x, r.y) = Board::BoardPosFromIndex(i);
+
+			r.x = ceil(squareWidth*r.x);
+			r.y = ceil(squareHeight*r.y);
+
+			SDL_RenderFillRect(renderer, &r);
+		}
 	}
 }
 

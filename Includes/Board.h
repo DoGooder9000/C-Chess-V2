@@ -19,7 +19,8 @@ class Board{
 
 		std::array<Piece, size> squares;
 
-		Bitboard bitboards[2][6]; // 2 Colors 6 types of pieces
+		std::array<Bitboard, 6> bitboards[2]; // All pieces of both colors
+		std::array<Bitboard, 2> colorBitboards; // One for all pieces of the color
 
 		UndoMove History[MAX_CHESS_MOVES];
 		int HistoryIndex = -1; // Start at -1 because we will increment at the start of the MovePiece function.
@@ -31,12 +32,13 @@ class Board{
 		
 		void GetBoardFromFEN(const char* FEN_String);
 
-		std::tuple<int, int> BoardPosFromIndex(int index);
-		int IndexFromBoardPos(std::tuple<int, int> BoardPos);
+		static std::tuple<int, int> BoardPosFromIndex(int index);
+		static int IndexFromBoardPos(std::tuple<int, int> BoardPos);
 
 		void GenerateBitboards();
+		void GenerateColorBitboards();
 		Bitboard GenerateBitboard(int PieceID);
-		void PrintBitboard(Bitboard bitboard);
+		static void PrintBitboard(Bitboard bitboard);
 
 
 		void MovePiece(Move move);

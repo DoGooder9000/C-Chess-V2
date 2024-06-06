@@ -1,7 +1,10 @@
 #pragma once
 
 #include <stdio.h>
+#include <cstdint>
 #include <array>
+
+typedef uint64_t Bitboard;
 
 class Board;
 
@@ -29,7 +32,8 @@ class Piece{
 
 		~Piece();
 
-		std::array<int, 64> GetLegalMoves(Board* board);
+		Bitboard GetLegalMoves(Board* board);
+		Bitboard KnightLegalMoves(Bitboard selfBitboard);
 
 		int GetPieceID();
 		void Move(int new_index);
