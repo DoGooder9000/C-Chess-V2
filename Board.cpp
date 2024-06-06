@@ -176,6 +176,13 @@ int Board::IndexFromBoardPos(std::tuple<int, int> BoardPos){
 }
 
 void Board::MovePiece(Move move){
+	HistoryIndex++;
+
+	History[HistoryIndex].color = color;
+	History[HistoryIndex].squares = squares;
+
+	// We need to save the position before we do the move
+
 	squares[move.target_index] = *move.piece; // Set the target position on the board to the piece
 
 	squares[move.target_index].Move(move.target_index);
@@ -229,4 +236,16 @@ void Board::PrintBitboard(Bitboard bitboard){
 		printf("\n");
 	}
 	printf("\n");
+}
+
+void Board::UndoBoardMove(){
+	squares = History[HistoryIndex].squares;
+	color = History[HistoryIndex].color;
+	castleRights = History[HistoryIndex].castleRights;
+
+
+	History[HistoryIndex] = UndoMove();
+
+	HistoryIndex--;
+
 }

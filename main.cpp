@@ -139,6 +139,17 @@ int main(int argc, char* argv[]){
 					break;
 				}
 			
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym)
+				{
+				case SDLK_LEFT:
+					currentBoard->UndoBoardMove();
+					break;
+				
+				default:
+					break;
+				}
+
 			default:
 				break;
 			}

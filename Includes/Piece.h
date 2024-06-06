@@ -23,6 +23,7 @@ class Piece{
 
 		Piece();
 		Piece(int piecetype, int color, int index);
+		Piece(const Piece& other);
 		~Piece();
 
 		int GetPieceID();
