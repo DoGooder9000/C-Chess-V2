@@ -60,6 +60,10 @@ Bitboard Piece::GetLegalMoves(Board* board){ // Pseudo Legal Moves (Moves not ba
 	return selfBitboard;
 }
 
+Bitboard Piece::RookLegalMoves(Board* board, Bitboard selfBitboard){
+	//Board::BoardPosFromIndex()
+}
+
 Bitboard Piece::KnightLegalMoves(Bitboard selfBitboard){
 	Bitboard LegalMoves = 0ULL;
 

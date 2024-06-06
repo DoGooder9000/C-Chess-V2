@@ -283,3 +283,57 @@ void Board::UndoBoardMove(){
 		HistoryIndex--;
 	}
 }
+
+void Board::GenerateSquaresToEdge(){
+	int X, Y;
+	int DistanceUp, DistanceDown, DistanceLeft, DistanceRight;
+
+	for (int j=0; j<size; j++){
+		std::tie(X, Y) = BoardPosFromIndex(j);
+
+		DistanceUp = Y;
+		DistanceDown = 7-Y;
+		DistanceLeft = X;
+		DistanceRight = 7-X;
+
+		for (int i=0; i<8; i++){
+			switch (i)
+			{
+			case TopLeft:
+				SquaresToEdge[j][i] = std::min(DistanceLeft, DistanceUp);
+				break;
+			
+			case TopRight:
+				SquaresToEdge[j][i] = std::min(DistanceRight, DistanceUp);
+				break;
+
+			case BottomLeft:
+				SquaresToEdge[j][i] = std::min(DistanceLeft, DistanceDown);
+				break;
+			
+			case BottomRight:
+				SquaresToEdge[j][i] = std::min(DistanceRight, DistanceDown);
+				break;
+			
+			case Up:
+				SquaresToEdge[j][i] = DistanceUp;
+				break;
+			
+			case Down:
+				SquaresToEdge[j][i] = DistanceDown;
+				break;
+			
+			case Left:
+				SquaresToEdge[j][i] = DistanceLeft;
+				break;
+			
+			case Right:
+				SquaresToEdge[j][i] = DistanceRight;
+				break;
+			
+			default:
+				break;
+			}
+		}		
+	}
+}
