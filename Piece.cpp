@@ -53,15 +53,91 @@ Bitboard Piece::GetLegalMoves(Board* board){ // Pseudo Legal Moves (Moves not ba
 
 	selfBitboard |= (1ULL << index);
 
-	if (piecetype == Knight){
-		return KnightLegalMoves(selfBitboard) & (~board->colorBitboards[color/8]); // Filter out all moves that land on squares already occupied by our color
+	switch (piecetype)
+	{
+	case Knight:
+		return KnightLegalMoves(selfBitboard) & (~board->colorBitboards[color/8]);
+		break;
+
+	case Rook:
+		return RookLegalMoves(board, selfBitboard) & (~board->colorBitboards[color/8]);
+		break;
+	
+	case Bishop:
+		return BishopLegalMoves(board, selfBitboard) & (~board->colorBitboards[color/8]);
+		break;
+	
+	case Queen:
+		return QueenLegalMoves(board, selfBitboard) & (~board->colorBitboards[color/8]);
+		break;
+	
+	default:
+		break;
 	}
+
+	
 
 	return selfBitboard;
 }
 
 Bitboard Piece::RookLegalMoves(Board* board, Bitboard selfBitboard){
-	//Board::BoardPosFromIndex()
+	Bitboard LegalMoves = 0ULL;
+
+	for (int dir=0; dir<4; dir++){
+		for (int step=0; step < board->SquaresToEdge[index][dir]; step++){
+			// We are stepping through the squares	
+
+			if (board->squares[index+(step+1)*board->DirectionsArray[dir]].piecetype == Piece::None){ // Self Index + (Step+1) * The amount that the index changes. Step +1 is neccesary because it starts on itself and needs to go one further
+				LegalMoves |= (1ULL << index+(step+1)*board->DirectionsArray[dir]);
+			}
+			else{
+				LegalMoves |= (1ULL << index+(step+1)*board->DirectionsArray[dir]);
+				break;
+			}
+		}
+	}
+
+	return LegalMoves;
+}
+
+Bitboard Piece::BishopLegalMoves(Board* board, Bitboard selfBitboard){
+	Bitboard LegalMoves = 0ULL;
+
+	for (int dir=4; dir<8; dir++){
+		for (int step=0; step < board->SquaresToEdge[index][dir]; step++){
+			// We are stepping through the squares	
+
+			if (board->squares[index+(step+1)*board->DirectionsArray[dir]].piecetype == Piece::None){ // Self Index + (Step+1) * The amount that the index changes. Step +1 is neccesary because it starts on itself and needs to go one further
+				LegalMoves |= (1ULL << index+(step+1)*board->DirectionsArray[dir]);
+			}
+			else{
+				LegalMoves |= (1ULL << index+(step+1)*board->DirectionsArray[dir]);
+				break;
+			}
+		}
+	}
+
+	return LegalMoves;
+}
+
+Bitboard Piece::QueenLegalMoves(Board* board, Bitboard selfBitboard){
+	Bitboard LegalMoves = 0ULL;
+
+	for (int dir=0; dir<8; dir++){
+		for (int step=0; step < board->SquaresToEdge[index][dir]; step++){
+			// We are stepping through the squares	
+
+			if (board->squares[index+(step+1)*board->DirectionsArray[dir]].piecetype == Piece::None){ // Self Index + (Step+1) * The amount that the index changes. Step +1 is neccesary because it starts on itself and needs to go one further
+				LegalMoves |= (1ULL << index+(step+1)*board->DirectionsArray[dir]);
+			}
+			else{
+				LegalMoves |= (1ULL << index+(step+1)*board->DirectionsArray[dir]);
+				break;
+			}
+		}
+	}
+
+	return LegalMoves;
 }
 
 Bitboard Piece::KnightLegalMoves(Bitboard selfBitboard){

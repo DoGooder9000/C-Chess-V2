@@ -49,5 +49,9 @@ class Board{
 
 		void MovePiece(Move move);
 		void UndoBoardMove();
+		void BoardBack();
+		void BoardForward();
 
+		void LoadPositionAtHistoryIndex(int index);
+		void StorePositionAtHistoryIndex(int index);
 };

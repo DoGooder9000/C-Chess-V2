@@ -35,6 +35,8 @@ class Piece{
 		Bitboard GetLegalMoves(Board* board);
 		Bitboard KnightLegalMoves(Bitboard selfBitboard);
 		Bitboard RookLegalMoves(Board* board, Bitboard selfBitboard);
+		Bitboard BishopLegalMoves(Board* board, Bitboard selfBitboard);
+		Bitboard QueenLegalMoves(Board* board, Bitboard selfBitboard);
 
 		int GetPieceID();
 		void Move(int new_index);

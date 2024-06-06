@@ -81,7 +81,7 @@ int main(int argc, char* argv[]){
 	SDL_FreeSurface(img);
 
 
-	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/8/RNBQKBNR");
 	currentPiece = nullptr;
 	
 	// Make a event variable to read into 
@@ -145,7 +145,11 @@ int main(int argc, char* argv[]){
 				switch (event.key.keysym.sym)
 				{
 				case SDLK_LEFT:
-					currentBoard->UndoBoardMove();
+					currentBoard->BoardBack();
+					break;
+				
+				case SDLK_RIGHT:
+					currentBoard->BoardForward();
 					break;
 				
 				default:

@@ -9,6 +9,8 @@ Board::Board(const char* FEN_String){
 
 	GenerateBitboards();
 	GenerateColorBitboards();
+
+	GenerateSquaresToEdge();
 }
 
 Board::~Board(){}
@@ -183,12 +185,37 @@ void Board::MovePiece(Move move){
 	if ((LegalMoves & (1ULL << move.target_index)) > 0){ // If move is in legal moves
 		HistoryIndex++;
 
-		History[HistoryIndex].color = color;
-		History[HistoryIndex].squares = squares;
-		History[HistoryIndex].castleRights = castleRights;
-		History[HistoryIndex].bitboards[0] = bitboards[0];
-		History[HistoryIndex].bitboards[1] = bitboards[1];
-		History[HistoryIndex].colorBitboards = colorBitboards;
+		StorePositionAtHistoryIndex(HistoryIndex);
+
+
+		/*
+
+		First we move up to a free cell
+
+		[pos0] [pos1] [pos2] [oldold] [ ]
+								       ^
+		
+		Then we store the old postion
+
+		[pos0] [pos1] [pos2] [oldold] [old]
+							   		    ^
+
+		We are now in a new position
+
+		When we go back, we need to first load this new position at a new index, then go back
+
+		When we go back, we load the old position at the current index
+
+		[pos0] [pos1] [pos2] [oldold] [old]
+							   		    >
+
+		And we go back one
+		
+		[pos0] [pos1] [pos2] [oldold] [future]
+							    ^
+		
+		To go forward, we need to 
+		*/
 
 		// We need to save the position before we do the move
 
@@ -267,21 +294,49 @@ void Board::PrintBitboard(Bitboard bitboard){
 
 void Board::UndoBoardMove(){
 	if (HistoryIndex >= 0){
-		squares = History[HistoryIndex].squares;
-		color = History[HistoryIndex].color;
-		castleRights = History[HistoryIndex].castleRights;
-
-		// Instead of saving the bitboards, you could just regenereate them, but that would take time.
-
-		bitboards[0] = History[HistoryIndex].bitboards[0];
-		bitboards[1] = History[HistoryIndex].bitboards[1];
-		colorBitboards = History[HistoryIndex].colorBitboards;
-
+		LoadPositionAtHistoryIndex(HistoryIndex);
 
 		History[HistoryIndex] = UndoMove();
 
 		HistoryIndex--;
 	}
+}
+
+void Board::BoardBack(){
+	if (HistoryIndex >= 0){
+		StorePositionAtHistoryIndex(HistoryIndex+1);
+
+		LoadPositionAtHistoryIndex(HistoryIndex);
+
+		HistoryIndex--;
+	}
+}
+
+void Board::BoardForward(){
+	HistoryIndex++;
+
+	LoadPositionAtHistoryIndex(HistoryIndex+1);
+}
+
+void Board::LoadPositionAtHistoryIndex(int index){
+	squares = History[index].squares;
+	color = History[index].color;
+	castleRights = History[index].castleRights;
+
+	// Instead of saving the bitboards, you could just regenerate them, but that would take time.
+
+	bitboards[0] = History[index].bitboards[0];
+	bitboards[1] = History[index].bitboards[1];
+	colorBitboards = History[index].colorBitboards;
+}
+
+void Board::StorePositionAtHistoryIndex(int index){
+	History[index].color = color;
+	History[index].squares = squares;
+	History[index].castleRights = castleRights;
+	History[index].bitboards[0] = bitboards[0];
+	History[index].bitboards[1] = bitboards[1];
+	History[index].colorBitboards = colorBitboards;
 }
 
 void Board::GenerateSquaresToEdge(){
