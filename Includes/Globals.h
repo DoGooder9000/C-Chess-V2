@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdio.h>
 #include <cstdint>
 #include <array>
@@ -19,7 +21,7 @@ enum CastleRights { WK = 1, WQ = 2, BK = 4, BQ = 8 };
 
 typedef struct UndoMove{
 	int color;
-	
+
 	std::array<Piece, 64> squares;
 
 	int castleRights;

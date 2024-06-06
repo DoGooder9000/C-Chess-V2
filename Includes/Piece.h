@@ -1,7 +1,9 @@
 #pragma once
 
 #include <stdio.h>
+#include <array>
 
+class Board;
 
 class Piece{
 	public:
@@ -24,7 +26,10 @@ class Piece{
 		Piece();
 		Piece(int piecetype, int color, int index);
 		Piece(const Piece& other);
+
 		~Piece();
+
+		std::array<int, 64> GetLegalMoves(Board* board);
 
 		int GetPieceID();
 		void Move(int new_index);

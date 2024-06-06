@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "Includes/Piece.h"
+#include "Includes/Board.h"
 
 
 Piece::Piece() : piecetype(None), color(White), index(-1), ID(None | White) {}
@@ -18,4 +19,10 @@ int Piece::GetPieceID(){
 
 void Piece::Move(int new_index){
 	index = new_index;
+}
+
+std::array<int, 64> Piece::GetLegalMoves(Board* board){
+	std::array<int, 64> LegalMoves = { -1 }; // A list of all squares the piece can move to
+
+	return LegalMoves;
 }

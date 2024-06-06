@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <algorithm>
 
 #include "Includes/Board.h"
 #include "Includes/Piece.h"
@@ -176,23 +177,28 @@ int Board::IndexFromBoardPos(std::tuple<int, int> BoardPos){
 }
 
 void Board::MovePiece(Move move){
-	HistoryIndex++;
+	std::array<int, 64> LegalMoves = move.piece->GetLegalMoves(this); // returns a list of indexes of moves
 
-	History[HistoryIndex].color = color;
-	History[HistoryIndex].squares = squares;
+	if (std::find(std::begin(LegalMoves), std::end(LegalMoves), move.target_index) != std::end(LegalMoves)){ // If move is in legal moves
+		HistoryIndex++;
 
-	// We need to save the position before we do the move
+		History[HistoryIndex].color = color;
+		History[HistoryIndex].squares = squares;
+		History[HistoryIndex].castleRights = castleRights;
 
-	squares[move.target_index] = *move.piece; // Set the target position on the board to the piece
+		// We need to save the position before we do the move
 
-	squares[move.target_index].Move(move.target_index);
+		squares[move.target_index] = *move.piece; // Set the target position on the board to the piece
 
-	squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to black
+		squares[move.target_index].Move(move.target_index);
 
-	GenerateBitboard(move.piece->GetPieceID());
+		squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to black
 
-	if (squares[move.target_index].piecetype != Piece::None){
-		GenerateBitboard(squares[move.target_index].GetPieceID());
+		GenerateBitboard(move.piece->GetPieceID());
+
+		if (squares[move.target_index].piecetype != Piece::None){
+			GenerateBitboard(squares[move.target_index].GetPieceID());
+		}
 	}
 }
 
@@ -239,13 +245,14 @@ void Board::PrintBitboard(Bitboard bitboard){
 }
 
 void Board::UndoBoardMove(){
-	squares = History[HistoryIndex].squares;
-	color = History[HistoryIndex].color;
-	castleRights = History[HistoryIndex].castleRights;
+	if (HistoryIndex >= 0){
+		squares = History[HistoryIndex].squares;
+		color = History[HistoryIndex].color;
+		castleRights = History[HistoryIndex].castleRights;
 
 
-	History[HistoryIndex] = UndoMove();
+		History[HistoryIndex] = UndoMove();
 
-	HistoryIndex--;
-
+		HistoryIndex--;
+	}
 }
