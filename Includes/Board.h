@@ -27,6 +27,7 @@ class Board{
 		int SquaresToEdge[size][8];
 
 		UndoMove History[MAX_CHESS_MOVES];
+		int MaxHistoryIndex = 0;
 		int HistoryIndex = -1; // Start at -1 because we will increment at the start of the MovePiece function.
 
 		int castleRights; // WK is 1, WQ is 2, BK is 4, BQ is 8

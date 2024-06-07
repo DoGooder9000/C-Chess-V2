@@ -187,6 +187,10 @@ void Board::MovePiece(Move move){
 
 		StorePositionAtHistoryIndex(HistoryIndex);
 
+		if (HistoryIndex > MaxHistoryIndex){
+			MaxHistoryIndex++;
+		}
+
 
 		/*
 
@@ -313,9 +317,11 @@ void Board::BoardBack(){
 }
 
 void Board::BoardForward(){
-	HistoryIndex++;
+	if (HistoryIndex < MaxHistoryIndex){
+		HistoryIndex++;
 
-	LoadPositionAtHistoryIndex(HistoryIndex+1);
+		LoadPositionAtHistoryIndex(HistoryIndex+1);
+	}
 }
 
 void Board::LoadPositionAtHistoryIndex(int index){
