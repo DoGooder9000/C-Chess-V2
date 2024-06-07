@@ -223,17 +223,55 @@ void Board::MovePiece(Move move){
 
 		// We need to save the position before we do the move
 
+		DoublePawnPushIndex = -1;
+
+		if (move.DoublePawnPush){
+			DoublePawnPushIndex = move.target_index;
+		}
+
+		int target_id;
+
+		if (move.isEnPassant){
+			if (move.piece->color == Piece::White){
+				if (move.target_index - move.start_index == -9){ // Left En Passant
+					squares[move.start_index-1] = Piece(Piece::None, Piece::White, move.start_index);
+					target_id = squares[move.start_index-1].GetPieceID();
+				}
+				else{
+					squares[move.start_index+1] = Piece(Piece::None, Piece::White, move.start_index); // Right En Passant
+					target_id = squares[move.start_index+1].GetPieceID();
+				}
+			}
+			else{
+				if (move.target_index - move.start_index == 7){ // Left En Passant
+					squares[move.start_index-1] = Piece(Piece::None, Piece::White, move.start_index);
+					target_id = squares[move.start_index-1].GetPieceID();
+				}
+				else{
+					squares[move.start_index+1] = Piece(Piece::None, Piece::White, move.start_index); // Right En Passant
+					target_id = squares[move.start_index+1].GetPieceID();
+				}
+			}
+		}
+
+		else{
+			target_id = squares[move.target_index].GetPieceID();
+		}
+
 		squares[move.target_index] = *move.piece; // Set the target position on the board to the piece
 
-		squares[move.target_index].Move(move.target_index);
+		squares[move.target_index].Move(move.target_index); // Move the piece
 
-		squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to black
+		squares[move.target_index].moved = true; // Say the piece moved
 
-		GenerateBitboard(move.piece->GetPieceID());
+		squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to blank
 
-		if (squares[move.target_index].piecetype != Piece::None){
-			GenerateBitboard(squares[move.target_index].GetPieceID());
+		GenerateBitboard(move.piece->GetPieceID()); // Generate moved piece's bitboard
+
+		if (target_id != Piece::None | Piece::White){
+			GenerateBitboard(target_id); // Generate taken piece's bitboard
 		}
+
 		GenerateColorBitboards();
 	}
 }
@@ -334,6 +372,7 @@ void Board::LoadPositionAtHistoryIndex(int index){
 	bitboards[0] = History[index].bitboards[0];
 	bitboards[1] = History[index].bitboards[1];
 	colorBitboards = History[index].colorBitboards;
+	DoublePawnPushIndex = History[index].DoublePawnPushIndex;
 }
 
 void Board::StorePositionAtHistoryIndex(int index){
@@ -343,6 +382,7 @@ void Board::StorePositionAtHistoryIndex(int index){
 	History[index].bitboards[0] = bitboards[0];
 	History[index].bitboards[1] = bitboards[1];
 	History[index].colorBitboards = colorBitboards;
+	History[index].DoublePawnPushIndex = DoublePawnPushIndex;
 }
 
 void Board::GenerateSquaresToEdge(){

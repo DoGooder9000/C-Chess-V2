@@ -31,4 +31,6 @@ typedef struct UndoMove{
 
 	std::array<Bitboard, 2> colorBitboards;
 
+	int DoublePawnPushIndex;
+
 }UndoMove;

@@ -81,7 +81,7 @@ int main(int argc, char* argv[]){
 	SDL_FreeSurface(img);
 
 
-	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/8/RNBQKBNR");
+	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 	currentPiece = nullptr;
 	
 	// Make a event variable to read into 
@@ -128,7 +128,19 @@ int main(int argc, char* argv[]){
 						int target_index = GetIndexClicked(currentBoard, event.motion.x, event.motion.y);
 
 						if (target_index != currentPiece->index){
-							Move move(currentPiece->index, target_index, currentPiece);
+							Move move;
+							if (currentPiece->piecetype == Piece::Pawn && (abs(target_index-currentPiece->index)%16 == 0)){
+								move = Move(currentPiece->index, target_index, currentPiece, true, false);
+							}
+
+							//				If the piece is a pawn		and				it is a diagonal move			and						the diagonal move square is free
+							else if (currentPiece->piecetype == Piece::Pawn && ((target_index-currentPiece->index)%8 != 0) && currentBoard->squares[target_index].piecetype == Piece::None){
+								move = Move(currentPiece->index, target_index, currentPiece, false, true);
+							}
+
+							else{
+								move = Move(currentPiece->index, target_index, currentPiece, false, false);
+							}
 						
 							currentBoard->MovePiece(move);
 						}

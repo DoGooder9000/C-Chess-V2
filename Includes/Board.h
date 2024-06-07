@@ -22,6 +22,8 @@ class Board{
 		std::array<Bitboard, 6> bitboards[2]; // All pieces of both colors
 		std::array<Bitboard, 2> colorBitboards; // One for all pieces of the color
 
+		int DoublePawnPushIndex;
+
 		enum Directions { Left = 0, Up, Right, Down, TopLeft, TopRight, BottomRight, BottomLeft};
 		int DirectionsArray[8] = {-1, -8, 1, 8, -9, -7, 9, 7};
 		int SquaresToEdge[size][8];

@@ -8,8 +8,10 @@ class Move{
         int start_index;
         int target_index;
         Piece* piece;
+        bool DoublePawnPush;
+        bool isEnPassant;
 
         Move();
-        Move(int start_index, int target_index, Piece* piece);
+        Move(int start_index, int target_index, Piece* piece, bool DoublePawnPush, bool isEnPassant);
         ~Move();
 };

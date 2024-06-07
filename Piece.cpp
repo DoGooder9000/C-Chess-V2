@@ -70,6 +70,14 @@ Bitboard Piece::GetLegalMoves(Board* board){ // Pseudo Legal Moves (Moves not ba
 	case Queen:
 		return QueenLegalMoves(board, selfBitboard) & (~board->colorBitboards[color/8]);
 		break;
+
+	case King:
+		return KingLegalMoves(board, selfBitboard) & (~board->colorBitboards[color/8]);
+		break;
+	
+	case Pawn:
+		return PawnLegalMoves(board, selfBitboard) & (~board->colorBitboards[color/8]);
+		break;
 	
 	default:
 		break;
@@ -176,5 +184,105 @@ Bitboard Piece::KnightLegalMoves(Bitboard selfBitboard){
 		LegalMoves |= selfBitboard << 6;								// ###
 	}																	// #
 
+	return LegalMoves;
+}
+
+Bitboard Piece::KingLegalMoves(Board* board, Bitboard selfBitboard){
+	Bitboard LegalMoves = 0ULL;
+
+	int Directions[8] = {-1};
+
+	if ((selfBitboard & NotInAFile) > 0){
+		Directions[0] = 1;
+	}
+	if ((selfBitboard & NotInFirstRank) > 0){
+		Directions[1] = 1;
+	}
+	if ((selfBitboard & NotInHFile) > 0){
+		Directions[2] = 1;
+	}
+	if ((selfBitboard & NotInEighthRank) > 0){
+		Directions[3] = 1;
+	}
+	if ((selfBitboard & NotInAFile & NotInFirstRank) > 0){
+		Directions[4] = 1;
+	}
+	if ((selfBitboard & NotInFirstRank & NotInHFile) > 0){
+		Directions[5] = 1;
+	}
+	if ((selfBitboard & NotInHFile & NotInEighthRank) > 0){
+		Directions[6] = 1;
+	}
+	if ((selfBitboard & NotInEighthRank & NotInAFile) > 0){
+		Directions[7] = 1;
+	}
+
+	for (int dir=0; dir<8; dir++){
+		if (Directions[dir] > 0){
+			LegalMoves |= (1ULL << index+board->DirectionsArray[dir]);
+		}
+
+	}
+
+	return LegalMoves;
+}
+
+Bitboard Piece::PawnLegalMoves(Board* board, Bitboard selfBitboard){
+	Bitboard LegalMoves = 0ULL;
+
+	if (color == Piece::White){
+		if (!moved && board->squares[index-8].piecetype == Piece::None && board->squares[index-16].piecetype == Piece::None){ // Double Pawn Pushes
+			LegalMoves |= (selfBitboard >> 16);
+		}
+
+		if (board->squares[index-8].piecetype == Piece::None){ // Single Pawn Pushes
+			LegalMoves |= (selfBitboard >> 8);
+		}
+
+		if (board->squares[index-9].piecetype != Piece::None){
+			LegalMoves |= (selfBitboard >> 9);
+		}
+
+		if (board->squares[index-7].piecetype != Piece::None){
+			LegalMoves |= (selfBitboard >> 7);
+		}
+
+		if (board->DoublePawnPushIndex != -1){
+			if (index+1 == board->DoublePawnPushIndex){
+				LegalMoves |= (selfBitboard >> 7);
+			}
+			else if (index-1 == board->DoublePawnPushIndex){
+				LegalMoves |= (selfBitboard >> 9);
+			}
+		}
+	}
+
+	else{
+		if (!moved && board->squares[index+8].piecetype == Piece::None && board->squares[index+16].piecetype == Piece::None){
+			LegalMoves |= (selfBitboard << 16);
+		}
+
+		if (board->squares[index+8].piecetype == Piece::None){
+			LegalMoves |= (selfBitboard << 8);
+		}
+
+		if (board->squares[index+9].piecetype != Piece::None){
+			LegalMoves |= (selfBitboard << 9);
+		}
+
+		if (board->squares[index+7].piecetype != Piece::None){
+			LegalMoves |= (selfBitboard << 7);
+		}
+
+		if (board->DoublePawnPushIndex != -1){
+			if (index+1 == board->DoublePawnPushIndex){
+				LegalMoves |= (selfBitboard << 9);
+			}
+			else if (index-1 == board->DoublePawnPushIndex){
+				LegalMoves |= (selfBitboard << 7);
+			}
+		}
+	}
+	
 	return LegalMoves;
 }

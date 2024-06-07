@@ -26,6 +26,8 @@ class Piece{
 
 		int index;
 
+		bool moved = false;
+
 		Piece();
 		Piece(int piecetype, int color, int index);
 		Piece(const Piece& other);
@@ -37,6 +39,8 @@ class Piece{
 		Bitboard RookLegalMoves(Board* board, Bitboard selfBitboard);
 		Bitboard BishopLegalMoves(Board* board, Bitboard selfBitboard);
 		Bitboard QueenLegalMoves(Board* board, Bitboard selfBitboard);
+		Bitboard KingLegalMoves(Board* board, Bitboard selfBitboard);
+		Bitboard PawnLegalMoves(Board* board, Bitboard selfBitboard);
 
 		int GetPieceID();
 		void Move(int new_index);
