@@ -48,7 +48,7 @@ Bitboard NotInFirstTwoFiles = 0xFCFCFCFCFCFCFCFC;
 Bitboard NotInLastTwoFiles = 0x3F3F3F3F3F3F3F3F;
 
 
-Bitboard Piece::GetLegalMoves(Board* board){ // Pseudo Legal Moves (Moves not based on color) are fixed inside this function
+Bitboard Piece::GetPseudoLegalMoves(Board* board){ // Pseudo Legal Moves (Moves not based on color) are fixed inside this function
 	Bitboard selfBitboard = 0ULL; // A list of all squares the piece can move to. Starts with self inside.
 
 	selfBitboard |= (1ULL << index);
@@ -86,6 +86,10 @@ Bitboard Piece::GetLegalMoves(Board* board){ // Pseudo Legal Moves (Moves not ba
 	
 
 	return selfBitboard;
+}
+
+Bitboard Piece::GetFullyLegalMoves(Board* board){
+	;
 }
 
 Bitboard Piece::RookLegalMoves(Board* board, Bitboard selfBitboard){
@@ -285,4 +289,20 @@ Bitboard Piece::PawnLegalMoves(Board* board, Bitboard selfBitboard){
 	}
 	
 	return LegalMoves;
+}
+
+Bitboard Piece::GetPawnAttacks(Board* board, Bitboard selfBitboard){
+	Bitboard attacked = 0ULL;
+
+	if (color == Piece::White){
+		attacked |= (selfBitboard >> 9);
+		attacked |= (selfBitboard >> 7);
+	}
+
+	else{
+		attacked |= (selfBitboard << 9);
+		attacked |= (selfBitboard << 7);
+	}
+	
+	return attacked;
 }

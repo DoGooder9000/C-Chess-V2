@@ -57,4 +57,12 @@ class Board{
 
 		void LoadPositionAtHistoryIndex(int index);
 		void StorePositionAtHistoryIndex(int index);
+
+		void ChangeColor();
+		int OppositeColor(int color);
+
+		bool KingChecked(int color);
+
+		Bitboard GetAllAttackedSquares(int color);
+		Bitboard GetPieceAttackedSquares(Piece piece);
 };

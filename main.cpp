@@ -110,6 +110,10 @@ int main(int argc, char* argv[]){
 						currentPiece = nullptr;
 					}
 
+					else if (currentPiece->color != currentBoard->color){
+						currentPiece = nullptr;
+					}
+
 					break;
 				
 				default:
@@ -181,7 +185,7 @@ int main(int argc, char* argv[]){
 		DrawBoard(currentBoard, renderer); 					// Draw the board
 
 		if (currentPiece != nullptr){
-			DrawBitboard(currentPiece->GetLegalMoves(currentBoard), legalMoveColor, renderer);
+			DrawBitboard(currentPiece->GetPseudoLegalMoves(currentBoard), legalMoveColor, renderer);
 		}
 		DrawPieces(currentBoard, PieceTextures, renderer);	// Draw the pieces on the board
 

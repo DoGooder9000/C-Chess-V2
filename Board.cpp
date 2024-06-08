@@ -180,7 +180,7 @@ int Board::IndexFromBoardPos(std::tuple<int, int> BoardPos){
 }
 
 void Board::MovePiece(Move move){
-	Bitboard LegalMoves = move.piece->GetLegalMoves(this); // returns a list of indexes of moves
+	Bitboard LegalMoves = move.piece->GetPseudoLegalMoves(this); // returns a list of indexes of moves
 
 	if ((LegalMoves & (1ULL << move.target_index)) > 0){ // If move is in legal moves
 		HistoryIndex++;
@@ -266,14 +266,33 @@ void Board::MovePiece(Move move){
 
 		squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to blank
 
-		GenerateBitboard(move.piece->GetPieceID()); // Generate moved piece's bitboard
 
-		if (target_id != Piece::None | Piece::White){
-			GenerateBitboard(target_id); // Generate taken piece's bitboard
+		if (KingChecked(color)){
+			UndoBoardMove();
 		}
 
-		GenerateColorBitboards();
+		else{
+			GenerateBitboard(move.piece->GetPieceID()); // Generate moved piece's bitboard
+
+			if (target_id != Piece::None | Piece::White){
+				GenerateBitboard(target_id); // Generate taken piece's bitboard
+			}
+
+			GenerateColorBitboards();
+			ChangeColor();
+		}
+
+
 	}
+}
+
+void Board::ChangeColor(){
+	color = OppositeColor(color);
+}
+
+int Board::OppositeColor(int color){
+	if (color == 0){return 8;}
+	else{return 0;}
 }
 
 void Board::GenerateBitboards(){
@@ -437,4 +456,29 @@ void Board::GenerateSquaresToEdge(){
 			}
 		}		
 	}
+}
+
+Bitboard Board::GetAllAttackedSquares(int color){
+	Bitboard attacked = 0ULL;
+
+	for (int i=0; i<size; i++){
+		if (squares[i].piecetype != Piece::None && squares[i].color == color){
+			attacked |= GetPieceAttackedSquares(squares[i]);
+		}
+	}
+
+	return attacked;
+}
+
+Bitboard Board::GetPieceAttackedSquares(Piece piece){
+	if (piece.piecetype == Piece::Pawn){
+		return piece.GetPawnAttacks(this, 0ULL| 1ULL << piece.index);
+	}
+	else{
+		return piece.GetPseudoLegalMoves(this);
+	}
+}
+
+bool Board::KingChecked(int color){
+	return (bitboards[color/8][King-1] & GetAllAttackedSquares(OppositeColor(color)));
 }

@@ -34,13 +34,16 @@ class Piece{
 
 		~Piece();
 
-		Bitboard GetLegalMoves(Board* board);
+		Bitboard GetPseudoLegalMoves(Board* board);
+		Bitboard GetFullyLegalMoves(Board* board);
 		Bitboard KnightLegalMoves(Bitboard selfBitboard);
 		Bitboard RookLegalMoves(Board* board, Bitboard selfBitboard);
 		Bitboard BishopLegalMoves(Board* board, Bitboard selfBitboard);
 		Bitboard QueenLegalMoves(Board* board, Bitboard selfBitboard);
 		Bitboard KingLegalMoves(Board* board, Bitboard selfBitboard);
 		Bitboard PawnLegalMoves(Board* board, Bitboard selfBitboard);
+
+		Bitboard GetPawnAttacks(Board* board, Bitboard selfBitboard);
 
 		int GetPieceID();
 		void Move(int new_index);
