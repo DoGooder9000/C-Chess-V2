@@ -24,6 +24,7 @@ const float squareHeight = (float)window_height/(float)8;
 SDL_Color lightSquareColor = {209, 163, 113, 255};
 SDL_Color darkSquareColor = {128, 100, 70, 255};
 SDL_Color legalMoveColor = {245, 211, 61, 255};
+SDL_Color attackedSquareColor = {255, 0, 0, 255};
 
 Board* currentBoard;
 Piece* currentPiece;
@@ -128,25 +129,29 @@ int main(int argc, char* argv[]){
 				{
 				case SDL_BUTTON_LEFT:
 					
-					if (currentPiece != nullptr && currentPiece->piecetype != Piece::None){
+					if (currentPiece != nullptr){
 						int target_index = GetIndexClicked(currentBoard, event.motion.x, event.motion.y);
 
-						if (target_index != currentPiece->index){
-							Move move;
-							if (currentPiece->piecetype == Piece::Pawn && (abs(target_index-currentPiece->index)%16 == 0)){
-								move = Move(currentPiece->index, target_index, currentPiece, true, false);
-							}
+						if ((currentPiece->GetFullyLegalMoves(currentBoard) & (1ULL << target_index)) > 0){
 
-							//				If the piece is a pawn		and				it is a diagonal move			and						the diagonal move square is free
-							else if (currentPiece->piecetype == Piece::Pawn && ((target_index-currentPiece->index)%8 != 0) && currentBoard->squares[target_index].piecetype == Piece::None){
-								move = Move(currentPiece->index, target_index, currentPiece, false, true);
-							}
+							if (target_index != currentPiece->index){
+								Move move;
+								if (currentPiece->piecetype == Piece::Pawn && (abs(target_index-currentPiece->index)%16 == 0)){
+									move = Move(currentPiece->index, target_index, currentPiece, true, false);
+								}
 
-							else{
-								move = Move(currentPiece->index, target_index, currentPiece, false, false);
+								//				If the piece is a pawn		and				it is a diagonal move			and						the diagonal move square is free
+								else if (currentPiece->piecetype == Piece::Pawn && ((target_index-currentPiece->index)%8 != 0) && currentBoard->squares[target_index].piecetype == Piece::None){
+									move = Move(currentPiece->index, target_index, currentPiece, false, true);
+								}
+
+								else{
+									move = Move(currentPiece->index, target_index, currentPiece, false, false);
+								}
+							
+								currentBoard->MovePiece(move);
 							}
 						
-							currentBoard->MovePiece(move);
 						}
 						currentPiece = nullptr;
 					}
@@ -185,8 +190,11 @@ int main(int argc, char* argv[]){
 		DrawBoard(currentBoard, renderer); 					// Draw the board
 
 		if (currentPiece != nullptr){
-			DrawBitboard(currentPiece->GetPseudoLegalMoves(currentBoard), legalMoveColor, renderer);
+			DrawBitboard(currentPiece->GetFullyLegalMoves(currentBoard), legalMoveColor, renderer);
 		}
+
+		//DrawBitboard(currentBoard->GetAllAttackedSquares(currentBoard->OppositeColor(currentBoard->color)), attackedSquareColor, renderer);
+
 		DrawPieces(currentBoard, PieceTextures, renderer);	// Draw the pieces on the board
 
 		SDL_RenderPresent(renderer);						// Show the final render

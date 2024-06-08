@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <cmath>
 #include "Includes/Piece.h"
+#include "Includes/Move.h"
 #include "Includes/Board.h"
 
 
@@ -17,7 +19,7 @@ int Piece::GetPieceID(){
 	return ID;
 }
 
-void Piece::Move(int new_index){
+void Piece::MoveSelf(int new_index){
 	index = new_index;
 }
 
@@ -89,7 +91,26 @@ Bitboard Piece::GetPseudoLegalMoves(Board* board){ // Pseudo Legal Moves (Moves 
 }
 
 Bitboard Piece::GetFullyLegalMoves(Board* board){
-	;
+	Bitboard pseudo = GetPseudoLegalMoves(board);
+
+	Bitboard finalLegalMoves = 0ULL;
+
+	for (int i=0; i<64; i++){
+		if ((pseudo & (1ULL << i)) > 0){
+			Move move = Move(index, i, this, (piecetype == Piece::Pawn && (abs(i-index)%16 == 0)), (piecetype == Piece::Pawn && ((i-index)%8 != 0) && board->squares[i].piecetype == Piece::None));
+
+			board->MovePiece(move);
+
+
+			if (board->KingChecked(Board::OppositeColor(board->color))){;}
+
+			else{finalLegalMoves |= 1ULL << i;}
+
+			board->UndoBoardMove();
+		}
+	}
+
+	return finalLegalMoves;
 }
 
 Bitboard Piece::RookLegalMoves(Board* board, Bitboard selfBitboard){
@@ -295,13 +316,13 @@ Bitboard Piece::GetPawnAttacks(Board* board, Bitboard selfBitboard){
 	Bitboard attacked = 0ULL;
 
 	if (color == Piece::White){
-		attacked |= (selfBitboard >> 9);
-		attacked |= (selfBitboard >> 7);
+		if ((selfBitboard & NotInAFile) > 0){ attacked |= (selfBitboard >> 9);}
+		if ((selfBitboard & NotInHFile) > 0){ attacked |= (selfBitboard >> 7);}
 	}
 
 	else{
-		attacked |= (selfBitboard << 9);
-		attacked |= (selfBitboard << 7);
+		if ((selfBitboard & NotInAFile) > 0){ attacked |= (selfBitboard << 7);}
+		if ((selfBitboard & NotInHFile) > 0){ attacked |= (selfBitboard << 9);}
 	}
 	
 	return attacked;

@@ -46,7 +46,7 @@ class Piece{
 		Bitboard GetPawnAttacks(Board* board, Bitboard selfBitboard);
 
 		int GetPieceID();
-		void Move(int new_index);
+		void MoveSelf(int new_index);
 
 	private:
 		int ID;	

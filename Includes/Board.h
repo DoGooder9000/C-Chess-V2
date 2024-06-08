@@ -44,7 +44,7 @@ class Board{
 
 		void GenerateBitboards();
 		void GenerateColorBitboards();
-		Bitboard GenerateBitboard(int PieceID);
+		void GenerateBitboard(int piecetype, int color);
 		static void PrintBitboard(Bitboard bitboard);
 
 		void GenerateSquaresToEdge();
@@ -59,7 +59,7 @@ class Board{
 		void StorePositionAtHistoryIndex(int index);
 
 		void ChangeColor();
-		int OppositeColor(int color);
+		static int OppositeColor(int color);
 
 		bool KingChecked(int color);
 

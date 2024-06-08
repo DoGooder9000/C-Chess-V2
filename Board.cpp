@@ -180,110 +180,107 @@ int Board::IndexFromBoardPos(std::tuple<int, int> BoardPos){
 }
 
 void Board::MovePiece(Move move){
-	Bitboard LegalMoves = move.piece->GetPseudoLegalMoves(this); // returns a list of indexes of moves
 
-	if ((LegalMoves & (1ULL << move.target_index)) > 0){ // If move is in legal moves
-		HistoryIndex++;
+	HistoryIndex++;
 
-		StorePositionAtHistoryIndex(HistoryIndex);
+	StorePositionAtHistoryIndex(HistoryIndex);
 
-		if (HistoryIndex > MaxHistoryIndex){
-			MaxHistoryIndex++;
-		}
+	if (HistoryIndex > MaxHistoryIndex){
+		MaxHistoryIndex++;
+	}
 
 
-		/*
+	/*
 
-		First we move up to a free cell
+	First we move up to a free cell
 
-		[pos0] [pos1] [pos2] [oldold] [ ]
-								       ^
-		
-		Then we store the old postion
+	[pos0] [pos1] [pos2] [oldold] [ ]
+									^
+	
+	Then we store the old postion
 
-		[pos0] [pos1] [pos2] [oldold] [old]
-							   		    ^
+	[pos0] [pos1] [pos2] [oldold] [old]
+									^
 
-		We are now in a new position
+	We are now in a new position
 
-		When we go back, we need to first load this new position at a new index, then go back
+	When we go back, we need to first load this new position at a new index, then go back
 
-		When we go back, we load the old position at the current index
+	When we go back, we load the old position at the current index
 
-		[pos0] [pos1] [pos2] [oldold] [old]
-							   		    >
+	[pos0] [pos1] [pos2] [oldold] [old]
+									>
 
-		And we go back one
-		
-		[pos0] [pos1] [pos2] [oldold] [future]
-							    ^
-		
-		To go forward, we need to 
-		*/
+	And we go back one
+	
+	[pos0] [pos1] [pos2] [oldold] [future]
+							^
+	
+	To go forward, we need to 
+	*/
 
-		// We need to save the position before we do the move
+	// We need to save the position before we do the move
 
-		DoublePawnPushIndex = -1;
+	DoublePawnPushIndex = -1;
 
-		if (move.DoublePawnPush){
-			DoublePawnPushIndex = move.target_index;
-		}
+	if (move.DoublePawnPush){
+		DoublePawnPushIndex = move.target_index;
+	}
 
-		int target_id;
+	int target_piecetype, target_color;
+	int start_piecetype = move.piece->piecetype;
+	int start_color = move.piece->color;
 
-		if (move.isEnPassant){
-			if (move.piece->color == Piece::White){
-				if (move.target_index - move.start_index == -9){ // Left En Passant
-					squares[move.start_index-1] = Piece(Piece::None, Piece::White, move.start_index);
-					target_id = squares[move.start_index-1].GetPieceID();
-				}
-				else{
-					squares[move.start_index+1] = Piece(Piece::None, Piece::White, move.start_index); // Right En Passant
-					target_id = squares[move.start_index+1].GetPieceID();
-				}
+	if (move.isEnPassant){
+		if (move.piece->color == Piece::White){
+			if (move.target_index - move.start_index == -9){ // Left En Passant
+				squares[move.start_index-1] = Piece(Piece::None, Piece::White, move.start_index);
+				target_piecetype = squares[move.start_index-1].piecetype;
+				target_color = squares[move.start_index-1].color;
 			}
 			else{
-				if (move.target_index - move.start_index == 7){ // Left En Passant
-					squares[move.start_index-1] = Piece(Piece::None, Piece::White, move.start_index);
-					target_id = squares[move.start_index-1].GetPieceID();
-				}
-				else{
-					squares[move.start_index+1] = Piece(Piece::None, Piece::White, move.start_index); // Right En Passant
-					target_id = squares[move.start_index+1].GetPieceID();
-				}
+				squares[move.start_index+1] = Piece(Piece::None, Piece::White, move.start_index); // Right En Passant
+				target_piecetype = squares[move.start_index+1].piecetype;
+				target_color = squares[move.start_index+1].color;
 			}
 		}
-
 		else{
-			target_id = squares[move.target_index].GetPieceID();
-		}
-
-		squares[move.target_index] = *move.piece; // Set the target position on the board to the piece
-
-		squares[move.target_index].Move(move.target_index); // Move the piece
-
-		squares[move.target_index].moved = true; // Say the piece moved
-
-		squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to blank
-
-
-		if (KingChecked(color)){
-			UndoBoardMove();
-		}
-
-		else{
-			GenerateBitboard(move.piece->GetPieceID()); // Generate moved piece's bitboard
-
-			if (target_id != Piece::None | Piece::White){
-				GenerateBitboard(target_id); // Generate taken piece's bitboard
+			if (move.target_index - move.start_index == 7){ // Left En Passant
+				squares[move.start_index-1] = Piece(Piece::None, Piece::White, move.start_index);
+				target_piecetype = squares[move.start_index-1].piecetype;
+				target_color = squares[move.start_index-1].color;
 			}
-
-			GenerateColorBitboards();
-			ChangeColor();
+			else{
+				squares[move.start_index+1] = Piece(Piece::None, Piece::White, move.start_index); // Right En Passant
+				target_piecetype = squares[move.start_index+1].piecetype;
+				target_color = squares[move.start_index+1].color;
+			}
 		}
-
-
 	}
+
+	else{
+		target_piecetype = squares[move.target_index].piecetype;
+		target_color = squares[move.target_index].color;
+	}
+
+	squares[move.target_index] = *move.piece; // Set the target position on the board to the piece
+
+	squares[move.target_index].MoveSelf(move.target_index); // Move the piece
+
+	squares[move.target_index].moved = true; // Say the piece moved
+
+	squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to blank
+
+	GenerateBitboard(start_piecetype, start_color); // Generate moved piece's bitboard
+
+	if (target_piecetype != Piece::None){
+		GenerateBitboard(target_piecetype, target_color); // Generate taken piece's bitboard
+	}
+
+	GenerateColorBitboards();
+	ChangeColor();
+
+	PrintBitboard(bitboards[start_color/8][start_piecetype-1]);
 }
 
 void Board::ChangeColor(){
@@ -326,16 +323,14 @@ void Board::GenerateColorBitboards(){
 	}
 }
 
-Bitboard Board::GenerateBitboard(int PieceID){
-	Bitboard bitboard = 0ULL;
+void Board::GenerateBitboard(int piecetype, int color){
+	bitboards[color/8][piecetype-1] = 0ULL;
 
 	for (int k=0; k<size; k++){
-		if (squares[k].GetPieceID() == PieceID){ // j+1 is neccesary because the Pawn ID starts at 1. 0 means type None
-			bitboard |= (1ULL << k);
+		if (squares[k].piecetype == piecetype && squares[k].color == color){ // j+1 is neccesary because the Pawn ID starts at 1. 0 means type None
+			bitboards[color/8][piecetype-1] |= (1ULL << k);
 		}
 	}
-
-	return bitboard;
 }
 
 void Board::PrintBitboard(Bitboard bitboard){
@@ -480,5 +475,5 @@ Bitboard Board::GetPieceAttackedSquares(Piece piece){
 }
 
 bool Board::KingChecked(int color){
-	return (bitboards[color/8][King-1] & GetAllAttackedSquares(OppositeColor(color)));
+	return (bitboards[color/8][5] & GetAllAttackedSquares(OppositeColor(color)))>0;
 }
