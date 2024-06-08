@@ -279,8 +279,6 @@ void Board::MovePiece(Move move){
 
 	GenerateColorBitboards();
 	ChangeColor();
-
-	PrintBitboard(bitboards[start_color/8][start_piecetype-1]);
 }
 
 void Board::ChangeColor(){
