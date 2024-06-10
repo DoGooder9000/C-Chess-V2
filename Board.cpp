@@ -186,7 +186,6 @@ int Board::IndexFromBoardPos(std::tuple<int, int> BoardPos){
 }
 
 void Board::MovePiece(Move move){
-
 	HistoryIndex++;
 
 	StorePositionAtHistoryIndex(HistoryIndex);
@@ -313,17 +312,33 @@ void Board::MovePiece(Move move){
 		target_color = squares[move.target_index].color;
 	}
 
-	squares[move.target_index] = *move.piece; // Set the target position on the board to the piece
+	if (move.PromotionPieceType != Piece::None){
+		squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index);
 
-	squares[move.target_index].MoveSelf(move.target_index); // Move the piece // Say the piece moved
+		squares[move.target_index] = Piece(move.PromotionPieceType, move.piece->color, move.target_index);
+		squares[move.target_index].moved = true;
 
-	squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to blank
+		GenerateBitboard(Piece::Pawn, move.piece->color);
 
-	GenerateBitboard(start_piecetype, start_color); // Generate moved piece's bitboard
+		GenerateBitboard(move.PromotionPieceType, move.piece->color);
 
-	if (target_piecetype != Piece::None){
-		GenerateBitboard(target_piecetype, target_color); // Generate taken piece's bitboard
+		GenerateBitboard(target_piecetype, target_color);
 	}
+
+	else{
+		squares[move.target_index] = *move.piece; // Set the target position on the board to the piece
+
+		squares[move.target_index].MoveSelf(move.target_index); // Move the piece // Say the piece moved
+
+		squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to blank
+
+		GenerateBitboard(start_piecetype, start_color); // Generate moved piece's bitboard
+
+		if (target_piecetype != Piece::None){
+			GenerateBitboard(target_piecetype, target_color); // Generate taken piece's bitboard
+		}
+	}
+
 
 	GenerateColorBitboards();
 	ChangeColor();

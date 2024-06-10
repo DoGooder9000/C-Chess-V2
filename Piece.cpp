@@ -261,7 +261,7 @@ std::list<Move> Piece::KingLegalMoves(Board* board){
 
 	}
 
-	if (!moved){
+	if (!moved && !board->KingChecked(color)){
 		if (color == 0){
 			if (board->squares[63].piecetype == Piece::Rook && board->squares[63].moved == false){ // King Side Castle
 				if (board->squares[61].piecetype == Piece::None && board->squares[62].piecetype == Piece::None){
@@ -365,18 +365,42 @@ std::list<Move> Piece::PawnLegalMoves(Board* board){
 		}
 
 		if (board->squares[index-8].piecetype == Piece::None){ // Single Pawn Pushes
+			if (index/8 != 1){
 				LegalMoves.push_back(Move(index, index-8, this, false, false));
+			}
+			else{
+				LegalMoves.push_back(Move(index, index-8, this, false, false, false, Piece::Queen));
+				LegalMoves.push_back(Move(index, index-8, this, false, false, false, Piece::Rook));
+				LegalMoves.push_back(Move(index, index-8, this, false, false, false, Piece::Knight));
+				LegalMoves.push_back(Move(index, index-8, this, false, false, false, Piece::Bishop));
+			}
 		}
 
 		if (board->squares[index-9].piecetype != Piece::None && (selfBitboard & NotInAFile) > 0){
 			if (board->squares[index-9].color != color){
-				LegalMoves.push_back(Move(index, index-9, this, false, false));
+				if (index/8 != 1){
+					LegalMoves.push_back(Move(index, index-9, this, false, false));
+				}
+				else{
+					LegalMoves.push_back(Move(index, index-9, this, false, false, false, Piece::Queen));
+					LegalMoves.push_back(Move(index, index-9, this, false, false, false, Piece::Rook));
+					LegalMoves.push_back(Move(index, index-9, this, false, false, false, Piece::Knight));
+					LegalMoves.push_back(Move(index, index-9, this, false, false, false, Piece::Bishop));
+				}
 			}
 		}
 
 		if (board->squares[index-7].piecetype != Piece::None && (selfBitboard & NotInHFile) > 0){
 			if (board->squares[index-7].color != color){
-				LegalMoves.push_back(Move(index, index-7, this, false, false));
+				if (index/8 != 1){
+					LegalMoves.push_back(Move(index, index-7, this, false, false));
+				}
+				else{
+					LegalMoves.push_back(Move(index, index-7, this, false, false, false, Piece::Queen));
+					LegalMoves.push_back(Move(index, index-7, this, false, false, false, Piece::Rook));
+					LegalMoves.push_back(Move(index, index-7, this, false, false, false, Piece::Knight));
+					LegalMoves.push_back(Move(index, index-7, this, false, false, false, Piece::Bishop));
+				}
 			}
 		}
 
@@ -396,18 +420,42 @@ std::list<Move> Piece::PawnLegalMoves(Board* board){
 		}
 
 		if (board->squares[index+8].piecetype == Piece::None){
+			if (index/8 != 6){
 				LegalMoves.push_back(Move(index, index+8, this, false, false));
+			}
+			else{
+				LegalMoves.push_back(Move(index, index+8, this, false, false, false, Piece::Queen));
+				LegalMoves.push_back(Move(index, index+8, this, false, false, false, Piece::Rook));
+				LegalMoves.push_back(Move(index, index+8, this, false, false, false, Piece::Knight));
+				LegalMoves.push_back(Move(index, index+8, this, false, false, false, Piece::Bishop));
+			}
 		}
 
 		if (board->squares[index+9].piecetype != Piece::None && (selfBitboard & NotInHFile) > 0){
 			if (board->squares[index+9].color != color){
-				LegalMoves.push_back(Move(index, index+9, this, false, false));
+				if (index/8 != 6){
+					LegalMoves.push_back(Move(index, index+9, this, false, false));
+				}
+				else{
+					LegalMoves.push_back(Move(index, index+9, this, false, false, false, Piece::Queen));
+					LegalMoves.push_back(Move(index, index+9, this, false, false, false, Piece::Rook));
+					LegalMoves.push_back(Move(index, index+9, this, false, false, false, Piece::Knight));
+					LegalMoves.push_back(Move(index, index+9, this, false, false, false, Piece::Bishop));
+				}
 			}
 		}
 
 		if (board->squares[index+7].piecetype != Piece::None && (selfBitboard & NotInAFile) > 0){
 			if (board->squares[index+7].color != color){
-				LegalMoves.push_back(Move(index, index+7, this, false, false));
+				if (index/8 != 6){
+					LegalMoves.push_back(Move(index, index+7, this, false, false));
+				}
+				else{
+					LegalMoves.push_back(Move(index, index+7, this, false, false, false, Piece::Queen));
+					LegalMoves.push_back(Move(index, index+7, this, false, false, false, Piece::Rook));
+					LegalMoves.push_back(Move(index, index+7, this, false, false, false, Piece::Knight));
+					LegalMoves.push_back(Move(index, index+7, this, false, false, false, Piece::Bishop));
+				}
 			}
 		}
 

@@ -84,10 +84,10 @@ int main(int argc, char* argv[]){
 	SDL_FreeSurface(img);
 
 
-	currentBoard = new Board("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R");
+	currentBoard = new Board("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8");
 	currentBoard->color = 0;
 
-	Perft(currentBoard, 3);
+	Perft(currentBoard, 5);
 
 	currentPiece = nullptr;
 	
@@ -96,11 +96,13 @@ int main(int argc, char* argv[]){
 	bool running = true;
 
 	while (running){
+		/*
 		if (currentBoard->color == 8){
 			std::list<Move> legalMoves = currentBoard->GetAllLegalMoves(currentBoard->color);
 			std::vector<Move> myVector(legalMoves.begin(), legalMoves.end());
 			currentBoard->MovePiece(myVector.at(0));
 		}
+		*/
 
 		// Get events
 		if (SDL_PollEvent(&event)){
@@ -157,6 +159,10 @@ int main(int argc, char* argv[]){
 									move = Move(currentPiece->index, target_index, currentPiece, false, true);
 								}
 
+								else if(currentPiece->piecetype == Piece::Pawn && (target_index/8 == 7 || target_index/8 == 0)){
+									move = Move(currentPiece->index, target_index, currentPiece, false, false, false, Piece::Queen);
+								}
+
 								else if (currentPiece->piecetype == Piece::King && abs(currentPiece->index - target_index) == 2){
 									move = Move(currentPiece->index, target_index, currentPiece, false, false, true);
 								}
@@ -164,7 +170,6 @@ int main(int argc, char* argv[]){
 								else{
 									move = Move(currentPiece->index, target_index, currentPiece, false, false);
 								}
-							
 								currentBoard->MovePiece(move);
 							}
 						
@@ -345,11 +350,13 @@ int CountPlySub(Board* board, int depth){
 
 					board->UndoBoardMove();
 
-					
+					/*
 					if (depth == 3){
 						move.Print();
 						printf("%d\n\n", _);
 					}
+					*/
+					
 				}
 			}
 		}
