@@ -65,4 +65,6 @@ class Board{
 
 		Bitboard GetAllAttackedSquares(int color);
 		Bitboard GetPieceAttackedSquares(Piece piece);
+
+		std::list<Move> GetAllLegalMoves(int color);
 };

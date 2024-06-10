@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <cstdint>
 #include <array>
+#include <vector>
+#include <iterator>
 
 typedef uint64_t Bitboard;
 
@@ -45,6 +47,8 @@ class Piece{
 		std::list<Move> QueenLegalMoves(Board* board);
 		std::list<Move> KingLegalMoves(Board* board);
 		std::list<Move> PawnLegalMoves(Board* board);
+
+		Bitboard KingAttackedSquares(Board* board);
 
 		Bitboard GetPawnAttacks(Board* board, Bitboard selfBitboard);
 

@@ -13,7 +13,7 @@ void DrawPieces(Board* board, SDL_Texture** PieceTextures, SDL_Renderer* rendere
 void DrawBitboard(Bitboard bitboard, SDL_Color color, SDL_Renderer* renderer);
 Piece* GetPieceClicked(Board* board, int mouseX, int mouseY);
 int GetIndexClicked(Board* board, int mouseX, int mouseY);
-void CountPly(Board* board, int depth);
+void Perft(Board* board, int depth);
 int CountPlySub(Board* board, int depth);
 
 const char* window_title = "Chess C++";
@@ -84,9 +84,10 @@ int main(int argc, char* argv[]){
 	SDL_FreeSurface(img);
 
 
-	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+	currentBoard = new Board("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R");
+	currentBoard->color = 0;
 
-	//CountPly(currentBoard, 6);
+	Perft(currentBoard, 3);
 
 	currentPiece = nullptr;
 	
@@ -95,6 +96,12 @@ int main(int argc, char* argv[]){
 	bool running = true;
 
 	while (running){
+		if (currentBoard->color == 8){
+			std::list<Move> legalMoves = currentBoard->GetAllLegalMoves(currentBoard->color);
+			std::vector<Move> myVector(legalMoves.begin(), legalMoves.end());
+			currentBoard->MovePiece(myVector.at(0));
+		}
+
 		// Get events
 		if (SDL_PollEvent(&event)){
 			// Decide what to do with each event type
@@ -311,7 +318,7 @@ Piece* GetPieceClicked(Board* board, int mouseX, int mouseY){
 	return &(board->squares[index]);
 }
 
-void CountPly(Board* board, int depth){
+void Perft(Board* board, int depth){
 	for (int i=0; i<depth; i++){
 		printf("depth: %d, Perft: %d\n", i, CountPlySub(board, i));
 	}
@@ -339,10 +346,10 @@ int CountPlySub(Board* board, int depth){
 					board->UndoBoardMove();
 
 					
-					//if (depth == 3){
-					//	move.Print();
-					//	printf("%d\n\n", _);
-					//}
+					if (depth == 3){
+						move.Print();
+						printf("%d\n\n", _);
+					}
 				}
 			}
 		}

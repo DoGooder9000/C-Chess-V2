@@ -515,6 +515,9 @@ Bitboard Board::GetPieceAttackedSquares(Piece piece){
 	if (piece.piecetype == Piece::Pawn){
 		return piece.GetPawnAttacks(this, 0ULL| 1ULL << piece.index);
 	}
+	else if(piece.piecetype == Piece::King){
+		return piece.KingAttackedSquares(this);
+	}
 	else{
 		return Piece::MoveListToBitboard(piece.GetPseudoLegalMoves(this));
 	}
@@ -522,4 +525,16 @@ Bitboard Board::GetPieceAttackedSquares(Piece piece){
 
 bool Board::KingChecked(int color){
 	return (bitboards[color/8][5] & GetAllAttackedSquares(OppositeColor(color)))>0;
+}
+
+std::list<Move> Board::GetAllLegalMoves(int color){
+	std::list<Move> allMoves;
+
+	for (int i=0; i<64; i++){
+		if (squares[i].color == color){
+			allMoves.splice(allMoves.end(), squares[i].GetFullyLegalMoves(this));
+		}
+	}
+
+	return allMoves;
 }

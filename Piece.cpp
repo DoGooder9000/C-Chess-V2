@@ -265,30 +265,93 @@ std::list<Move> Piece::KingLegalMoves(Board* board){
 		if (color == 0){
 			if (board->squares[63].piecetype == Piece::Rook && board->squares[63].moved == false){ // King Side Castle
 				if (board->squares[61].piecetype == Piece::None && board->squares[62].piecetype == Piece::None){
-					LegalMoves.push_back(Move(index, 62, this, false, false, true));
+					Bitboard attackedSquares = board->GetAllAttackedSquares(Piece::Black);
+					Bitboard movingTo = 0ULL | (1ULL << 61) | (1ULL << 62);
+
+					if ((attackedSquares & movingTo) > 0){}
+					else{LegalMoves.push_back(Move(index, 62, this, false, false, true));}
 				}
 			}
 			if (board->squares[63].piecetype == Piece::Rook && board->squares[63].moved == false){ // Queen Side
 				if (board->squares[57].piecetype == Piece::None && board->squares[58].piecetype == Piece::None && board->squares[59].piecetype == Piece::None){
-					LegalMoves.push_back(Move(index, 58, this, false, false, true));
+					Bitboard attackedSquares = board->GetAllAttackedSquares(Piece::Black);
+					Bitboard movingTo = 0ULL | (1ULL << 57) | (1ULL << 58) | (1ULL << 59);
+
+					if ((attackedSquares & movingTo) > 0){}
+					else{LegalMoves.push_back(Move(index, 58, this, false, false, true));}
 				}
 			}
 		}
 		else{
 			if (board->squares[7].piecetype == Piece::Rook && board->squares[7].moved == false){ // King Side
 				if (board->squares[5].piecetype == Piece::None && board->squares[6].piecetype == Piece::None){
-					LegalMoves.push_back(Move(index, 6, this, false, false, true));
+					Bitboard attackedSquares = board->GetAllAttackedSquares(Piece::White);
+					Bitboard movingTo = 0ULL | (1ULL << 5) | (1ULL << 6);
+
+					if ((attackedSquares & movingTo) > 0){}
+					else{LegalMoves.push_back(Move(index, 6, this, false, false, true));}
+					
 				}
 			}
 			if (board->squares[0].piecetype == Piece::Rook && board->squares[0].moved == false){ // Queen Side
 				if (board->squares[1].piecetype == Piece::None && board->squares[2].piecetype == Piece::None && board->squares[3].piecetype == Piece::None){
-					LegalMoves.push_back(Move(index, 2, this, false, false, true));
+					Bitboard attackedSquares = board->GetAllAttackedSquares(Piece::White);
+					Bitboard movingTo = 0ULL | (1ULL << 1) | (1ULL << 2) | (1ULL << 3);
+
+					if ((attackedSquares & movingTo) > 0){}
+					else{LegalMoves.push_back(Move(index, 2, this, false, false, true));}
 				}
 			}
 		}
 	}
 
 	return LegalMoves;
+}
+
+Bitboard Piece::KingAttackedSquares(Board* board){
+	Bitboard attacked;
+
+	Bitboard selfBitboard = 0ULL | (1ULL << index);
+
+	Bitboard notSameColor = ~board->colorBitboards[color/8];
+
+	int Directions[8] = {-1};
+
+	if ((selfBitboard & NotInAFile) > 0){
+		Directions[0] = 1;
+	}
+	if ((selfBitboard & NotInFirstRank) > 0){
+		Directions[1] = 1;
+	}
+	if ((selfBitboard & NotInHFile) > 0){
+		Directions[2] = 1;
+	}
+	if ((selfBitboard & NotInEighthRank) > 0){
+		Directions[3] = 1;
+	}
+	if ((selfBitboard & NotInAFile & NotInFirstRank) > 0){
+		Directions[4] = 1;
+	}
+	if ((selfBitboard & NotInFirstRank & NotInHFile) > 0){
+		Directions[5] = 1;
+	}
+	if ((selfBitboard & NotInHFile & NotInEighthRank) > 0){
+		Directions[6] = 1;
+	}
+	if ((selfBitboard & NotInEighthRank & NotInAFile) > 0){
+		Directions[7] = 1;
+	}
+
+	for (int dir=0; dir<8; dir++){
+		if (Directions[dir] > 0){
+			if (board->squares[index+board->DirectionsArray[dir]].piecetype == Piece::None || board->squares[index+board->DirectionsArray[dir]].color != color){
+				attacked |= (1ULL << index+board->DirectionsArray[dir]);
+			}
+		}
+
+	}
+
+	return attacked;
 }
 
 std::list<Move> Piece::PawnLegalMoves(Board* board){
