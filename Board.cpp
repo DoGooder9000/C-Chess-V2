@@ -468,7 +468,7 @@ Bitboard Board::GetPieceAttackedSquares(Piece piece){
 		return piece.GetPawnAttacks(this, 0ULL| 1ULL << piece.index);
 	}
 	else{
-		return piece.GetPseudoLegalMoves(this);
+		return Piece::MoveListToBitboard(piece.GetPseudoLegalMoves(this));
 	}
 }
 

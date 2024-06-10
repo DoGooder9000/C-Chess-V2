@@ -1,12 +1,15 @@
 #pragma once
 
 #include <stdio.h>
+#include <list>
+#include <algorithm>
 #include <cstdint>
 #include <array>
 
 typedef uint64_t Bitboard;
 
 class Board;
+class Move;
 
 class Piece{
 	public:
@@ -34,16 +37,18 @@ class Piece{
 
 		~Piece();
 
-		Bitboard GetPseudoLegalMoves(Board* board);
-		Bitboard GetFullyLegalMoves(Board* board);
-		Bitboard KnightLegalMoves(Bitboard selfBitboard);
-		Bitboard RookLegalMoves(Board* board, Bitboard selfBitboard);
-		Bitboard BishopLegalMoves(Board* board, Bitboard selfBitboard);
-		Bitboard QueenLegalMoves(Board* board, Bitboard selfBitboard);
-		Bitboard KingLegalMoves(Board* board, Bitboard selfBitboard);
-		Bitboard PawnLegalMoves(Board* board, Bitboard selfBitboard);
+		std::list<Move> GetPseudoLegalMoves(Board* board);
+		std::list<Move> GetFullyLegalMoves(Board* board);
+		std::list<Move> KnightLegalMoves(Board* board);
+		std::list<Move> RookLegalMoves(Board* board);
+		std::list<Move> BishopLegalMoves(Board* board);
+		std::list<Move> QueenLegalMoves(Board* board);
+		std::list<Move> KingLegalMoves(Board* board);
+		std::list<Move> PawnLegalMoves(Board* board);
 
 		Bitboard GetPawnAttacks(Board* board, Bitboard selfBitboard);
+
+		static Bitboard MoveListToBitboard(std::list<Move> moveList);
 
 		int GetPieceID();
 		void MoveSelf(int new_index);

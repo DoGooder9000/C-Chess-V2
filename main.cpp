@@ -13,6 +13,8 @@ void DrawPieces(Board* board, SDL_Texture** PieceTextures, SDL_Renderer* rendere
 void DrawBitboard(Bitboard bitboard, SDL_Color color, SDL_Renderer* renderer);
 Piece* GetPieceClicked(Board* board, int mouseX, int mouseY);
 int GetIndexClicked(Board* board, int mouseX, int mouseY);
+void CountPly(Board* board, int depth);
+int CountPlySub(Board* board, int depth);
 
 const char* window_title = "Chess C++";
 const int window_width = 400;
@@ -83,6 +85,9 @@ int main(int argc, char* argv[]){
 
 
 	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+
+	CountPly(currentBoard, 4);
+
 	currentPiece = nullptr;
 	
 	// Make a event variable to read into 
@@ -132,7 +137,7 @@ int main(int argc, char* argv[]){
 					if (currentPiece != nullptr){
 						int target_index = GetIndexClicked(currentBoard, event.motion.x, event.motion.y);
 
-						if ((currentPiece->GetFullyLegalMoves(currentBoard) & (1ULL << target_index)) > 0){
+						if ((Piece::MoveListToBitboard(currentPiece->GetFullyLegalMoves(currentBoard)) & (1ULL << target_index)) > 0){
 
 							if (target_index != currentPiece->index){
 								Move move;
@@ -190,7 +195,7 @@ int main(int argc, char* argv[]){
 		DrawBoard(currentBoard, renderer); 					// Draw the board
 
 		if (currentPiece != nullptr){
-			DrawBitboard(currentPiece->GetFullyLegalMoves(currentBoard), legalMoveColor, renderer);
+			DrawBitboard(Piece::MoveListToBitboard(currentPiece->GetFullyLegalMoves(currentBoard)), legalMoveColor, renderer);
 		}
 
 		//DrawBitboard(currentBoard->GetAllAttackedSquares(currentBoard->OppositeColor(currentBoard->color)), attackedSquareColor, renderer);
@@ -300,4 +305,41 @@ Piece* GetPieceClicked(Board* board, int mouseX, int mouseY){
 	int index = GetIndexClicked(board, mouseX, mouseY);
 
 	return &(board->squares[index]);
+}
+
+void CountPly(Board* board, int depth){
+	for (int i=0; i<depth; i++){
+		printf("depth: %d, Perft: %d\n", i, CountPlySub(board, i));
+	}
+}
+
+int CountPlySub(Board* board, int depth){
+	int moveCount = 0;
+
+	
+	if (depth == 0){
+		return 1;
+	}
+
+
+	else{
+		for (int i=0; i<board->size; i++){
+			if (board->squares[i].color == board->color){
+				for (Move move : board->squares[i].GetFullyLegalMoves(board)){
+					board->MovePiece(move);
+					int _ = CountPlySub(board, depth-1);
+					moveCount += _;
+					board->UndoBoardMove();
+					if (depth == 3){
+						move.Print();
+						printf("Move Count: %d\n", _);
+					}
+				}
+			}
+		}
+
+	}
+
+
+	return moveCount;
 }

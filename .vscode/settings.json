@@ -77,6 +77,9 @@
         "queue": "cpp",
         "stack": "cpp",
         "xhash": "cpp",
-        "__hash_table": "cpp"
-    }
+        "__hash_table": "cpp",
+        "ios": "cpp",
+        "xiosbase": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
 }
