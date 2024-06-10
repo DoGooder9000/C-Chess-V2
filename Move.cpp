@@ -2,16 +2,19 @@
 #include <string>
 
 Move::Move(int start_index, int target_index, Piece* piece, bool DoublePawnPush, bool isEnPassant) : start_index(start_index), target_index(target_index), piece(piece), 
-DoublePawnPush(DoublePawnPush), isEnPassant(isEnPassant) {}
+DoublePawnPush(DoublePawnPush), isEnPassant(isEnPassant), isCastle(false) {}
+
+Move::Move(int start_index, int target_index, Piece* piece, bool DoublePawnPush, bool isEnPassant, bool isCastle) : start_index(start_index), target_index(target_index), piece(piece), 
+DoublePawnPush(DoublePawnPush), isEnPassant(isEnPassant), isCastle(isCastle) {}
 
 Move::Move() : target_index(-1){}
 
-Move::Move(const Move& other) : start_index(other.start_index), target_index(other.target_index), piece(other.piece), DoublePawnPush(other.DoublePawnPush), isEnPassant(other.isEnPassant){}
+Move::Move(const Move& other) : start_index(other.start_index), target_index(other.target_index), piece(other.piece), DoublePawnPush(other.DoublePawnPush), isEnPassant(other.isEnPassant), isCastle(other.isCastle){}
 
 Move::~Move(){}
 
 bool Move::operator==(const Move& other){
-    return (start_index==other.start_index && target_index == other.target_index && piece==other.piece && DoublePawnPush==other.DoublePawnPush && isEnPassant==other.isEnPassant);
+    return (start_index==other.start_index && target_index == other.target_index && piece==other.piece && DoublePawnPush==other.DoublePawnPush && isEnPassant==other.isEnPassant && isCastle==other.isCastle);
 }
 
 void Move::Print(){

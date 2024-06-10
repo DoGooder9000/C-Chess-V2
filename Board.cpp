@@ -27,12 +27,18 @@ void Board::GetBoardFromFEN(const char* FEN_String){
 		switch (FEN_String[fen_index]){
 			case 'p':
 				squares[square_index] = Piece(Piece::Pawn, Piece::Black, square_index);
+				if (square_index / 8 != 1){
+					squares[square_index].moved = true;
+				}
 				fen_index++;
 				square_index++;
 				break;
 			
 			case 'P':
 				squares[square_index] = Piece(Piece::Pawn, Piece::White, square_index);
+				if (square_index / 8 != 6){
+					squares[square_index].moved = true;
+				}
 				fen_index++;
 				square_index++;
 				break;
@@ -258,6 +264,50 @@ void Board::MovePiece(Move move){
 		}
 	}
 
+	else if(move.isCastle){
+		target_piecetype = Piece::Rook;
+
+		if (move.piece->color == Piece::White){
+			target_color = 0;
+
+			if (move.target_index == 62){
+				squares[61] = squares[63];
+
+				squares[63] = Piece(Piece::None, Piece::White, move.start_index);
+
+				squares[61].MoveSelf(61);
+			}
+
+			else{
+				squares[59] = squares[56];
+
+				squares[56] = Piece(Piece::None, Piece::White, move.start_index);
+
+				squares[59].MoveSelf(59);
+			}
+		}
+
+		else{
+			target_color = 8;
+
+			if (move.target_index == 6){
+				squares[5] = squares[7];
+
+				squares[7] = Piece(Piece::None, Piece::White, move.start_index);
+
+				squares[5].MoveSelf(5);
+			}
+
+			else{
+				squares[3] = squares[0];
+
+				squares[0] = Piece(Piece::None, Piece::White, move.start_index);
+
+				squares[3].MoveSelf(3);
+			}
+		}
+	}
+
 	else{
 		target_piecetype = squares[move.target_index].piecetype;
 		target_color = squares[move.target_index].color;
@@ -265,9 +315,7 @@ void Board::MovePiece(Move move){
 
 	squares[move.target_index] = *move.piece; // Set the target position on the board to the piece
 
-	squares[move.target_index].MoveSelf(move.target_index); // Move the piece
-
-	squares[move.target_index].moved = true; // Say the piece moved
+	squares[move.target_index].MoveSelf(move.target_index); // Move the piece // Say the piece moved
 
 	squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to blank
 

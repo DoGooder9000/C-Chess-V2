@@ -19,6 +19,7 @@ int Piece::GetPieceID(){
 
 void Piece::MoveSelf(int new_index){
 	index = new_index;
+	moved = true;
 }
 
 /*
@@ -252,10 +253,39 @@ std::list<Move> Piece::KingLegalMoves(Board* board){
 	}
 
 	for (int dir=0; dir<8; dir++){
-		if (Directions[dir] > 0 && board->squares[index+board->DirectionsArray[dir]].color != color){
-			LegalMoves.push_back(Move(index, index+board->DirectionsArray[dir], this, false, false));
+		if (Directions[dir] > 0){
+			if (board->squares[index+board->DirectionsArray[dir]].piecetype == Piece::None || board->squares[index+board->DirectionsArray[dir]].color != color){
+				LegalMoves.push_back(Move(index, index+board->DirectionsArray[dir], this, false, false));
+			}
 		}
 
+	}
+
+	if (!moved){
+		if (color == 0){
+			if (board->squares[63].piecetype == Piece::Rook && board->squares[63].moved == false){ // King Side Castle
+				if (board->squares[61].piecetype == Piece::None && board->squares[62].piecetype == Piece::None){
+					LegalMoves.push_back(Move(index, 62, this, false, false, true));
+				}
+			}
+			if (board->squares[63].piecetype == Piece::Rook && board->squares[63].moved == false){ // Queen Side
+				if (board->squares[57].piecetype == Piece::None && board->squares[58].piecetype == Piece::None && board->squares[59].piecetype == Piece::None){
+					LegalMoves.push_back(Move(index, 58, this, false, false, true));
+				}
+			}
+		}
+		else{
+			if (board->squares[7].piecetype == Piece::Rook && board->squares[7].moved == false){ // King Side
+				if (board->squares[5].piecetype == Piece::None && board->squares[6].piecetype == Piece::None){
+					LegalMoves.push_back(Move(index, 6, this, false, false, true));
+				}
+			}
+			if (board->squares[0].piecetype == Piece::Rook && board->squares[0].moved == false){ // Queen Side
+				if (board->squares[1].piecetype == Piece::None && board->squares[2].piecetype == Piece::None && board->squares[3].piecetype == Piece::None){
+					LegalMoves.push_back(Move(index, 2, this, false, false, true));
+				}
+			}
+		}
 	}
 
 	return LegalMoves;
@@ -263,6 +293,8 @@ std::list<Move> Piece::KingLegalMoves(Board* board){
 
 std::list<Move> Piece::PawnLegalMoves(Board* board){
 	std::list<Move> LegalMoves;
+
+	Bitboard selfBitboard = 0ULL | (1ULL << index);
 
 	if (color == Piece::White){
 		if (!moved && board->squares[index-8].piecetype == Piece::None && board->squares[index-16].piecetype == Piece::None){ // Double Pawn Pushes
@@ -273,23 +305,23 @@ std::list<Move> Piece::PawnLegalMoves(Board* board){
 				LegalMoves.push_back(Move(index, index-8, this, false, false));
 		}
 
-		if (board->squares[index-9].piecetype != Piece::None){
+		if (board->squares[index-9].piecetype != Piece::None && (selfBitboard & NotInAFile) > 0){
 			if (board->squares[index-9].color != color){
 				LegalMoves.push_back(Move(index, index-9, this, false, false));
 			}
 		}
 
-		if (board->squares[index-7].piecetype != Piece::None){
+		if (board->squares[index-7].piecetype != Piece::None && (selfBitboard & NotInHFile) > 0){
 			if (board->squares[index-7].color != color){
 				LegalMoves.push_back(Move(index, index-7, this, false, false));
 			}
 		}
 
 		if (board->DoublePawnPushIndex != -1){
-			if (index+1 == board->DoublePawnPushIndex && board->squares[index+1].color != color){
+			if (index+1 == board->DoublePawnPushIndex && board->squares[index+1].color != color  && (selfBitboard & NotInHFile) > 0){
 				LegalMoves.push_back(Move(index, index-7, this, false, true));
 			}
-			else if (index-1 == board->DoublePawnPushIndex && board->squares[index-1].color != color){
+			else if (index-1 == board->DoublePawnPushIndex && board->squares[index-1].color != color && (selfBitboard & NotInAFile) > 0){
 				LegalMoves.push_back(Move(index, index-9, this, false, true));
 			}
 		}
@@ -304,23 +336,23 @@ std::list<Move> Piece::PawnLegalMoves(Board* board){
 				LegalMoves.push_back(Move(index, index+8, this, false, false));
 		}
 
-		if (board->squares[index+9].piecetype != Piece::None){
+		if (board->squares[index+9].piecetype != Piece::None && (selfBitboard & NotInHFile) > 0){
 			if (board->squares[index+9].color != color){
 				LegalMoves.push_back(Move(index, index+9, this, false, false));
 			}
 		}
 
-		if (board->squares[index+7].piecetype != Piece::None){
+		if (board->squares[index+7].piecetype != Piece::None && (selfBitboard & NotInAFile) > 0){
 			if (board->squares[index+7].color != color){
 				LegalMoves.push_back(Move(index, index+7, this, false, false));
 			}
 		}
 
 		if (board->DoublePawnPushIndex != -1){
-			if (index+1 == board->DoublePawnPushIndex && board->squares[index+1].color != color){
+			if (index+1 == board->DoublePawnPushIndex && board->squares[index+1].color != color && (selfBitboard & NotInHFile) > 0){
 				LegalMoves.push_back(Move(index, index+9, this, false, true));
 			}
-			else if (index-1 == board->DoublePawnPushIndex && board->squares[index-1].color != color){
+			else if (index-1 == board->DoublePawnPushIndex && board->squares[index-1].color != color && (selfBitboard & NotInAFile) > 0){
 				LegalMoves.push_back(Move(index, index+9, this, false, true));
 			}
 		}

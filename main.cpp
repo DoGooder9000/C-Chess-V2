@@ -86,7 +86,7 @@ int main(int argc, char* argv[]){
 
 	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
-	CountPly(currentBoard, 4);
+	//CountPly(currentBoard, 6);
 
 	currentPiece = nullptr;
 	
@@ -148,6 +148,10 @@ int main(int argc, char* argv[]){
 								//				If the piece is a pawn		and				it is a diagonal move			and						the diagonal move square is free
 								else if (currentPiece->piecetype == Piece::Pawn && ((target_index-currentPiece->index)%8 != 0) && currentBoard->squares[target_index].piecetype == Piece::None){
 									move = Move(currentPiece->index, target_index, currentPiece, false, true);
+								}
+
+								else if (currentPiece->piecetype == Piece::King && abs(currentPiece->index - target_index) == 2){
+									move = Move(currentPiece->index, target_index, currentPiece, false, false, true);
 								}
 
 								else{
@@ -327,13 +331,18 @@ int CountPlySub(Board* board, int depth){
 			if (board->squares[i].color == board->color){
 				for (Move move : board->squares[i].GetFullyLegalMoves(board)){
 					board->MovePiece(move);
+
 					int _ = CountPlySub(board, depth-1);
+
 					moveCount += _;
+
 					board->UndoBoardMove();
-					if (depth == 3){
-						move.Print();
-						printf("Move Count: %d\n", _);
-					}
+
+					
+					//if (depth == 3){
+					//	move.Print();
+					//	printf("%d\n\n", _);
+					//}
 				}
 			}
 		}

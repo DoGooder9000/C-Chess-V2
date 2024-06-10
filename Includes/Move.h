@@ -4,21 +4,23 @@
 #include "Piece.h"
 
 class Move{
-    public:
-        int start_index;
-        int target_index;
-        Piece* piece;
-        bool DoublePawnPush;
-        bool isEnPassant;
+	public:
+		int start_index;
+		int target_index;
+		Piece* piece;
+		bool DoublePawnPush;
+		bool isEnPassant;
+		bool isCastle;
 
-        Move();
-        Move(Move const& other);
-        Move(int start_index, int target_index, Piece* piece, bool DoublePawnPush, bool isEnPassant);
-        ~Move();
+		Move();
+		Move(Move const& other);
+		Move(int start_index, int target_index, Piece* piece, bool DoublePawnPush, bool isEnPassant);
+		Move(int start_index, int target_index, Piece* piece, bool DoublePawnPush, bool isEnPassant, bool isCastle);
+		~Move();
 
-        bool operator==(const Move& other);
+		bool operator==(const Move& other);
 
-        void Print();
+		void Print();
 
-        static char* GetReadableIndex(int index);
+		static char* GetReadableIndex(int index);
 };
