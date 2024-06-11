@@ -14,7 +14,7 @@ void DrawBitboard(Bitboard bitboard, SDL_Color color, SDL_Renderer* renderer);
 Piece* GetPieceClicked(Board* board, int mouseX, int mouseY);
 int GetIndexClicked(Board* board, int mouseX, int mouseY);
 void Perft(Board* board, int depth);
-int CountPlySub(Board* board, int depth);
+int CountPlySub(Board* board, int depth, int maxDepth);
 
 const char* window_title = "Chess C++";
 const int window_width = 400;
@@ -84,10 +84,10 @@ int main(int argc, char* argv[]){
 	SDL_FreeSurface(img);
 
 
-	currentBoard = new Board("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8");
+	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 	currentBoard->color = 0;
 
-	Perft(currentBoard, 5);
+	Perft(currentBoard, 6);
 
 	currentPiece = nullptr;
 	
@@ -160,7 +160,7 @@ int main(int argc, char* argv[]){
 								}
 
 								else if(currentPiece->piecetype == Piece::Pawn && (target_index/8 == 7 || target_index/8 == 0)){
-									move = Move(currentPiece->index, target_index, currentPiece, false, false, false, Piece::Queen);
+									move = Move(currentPiece->index, target_index, currentPiece, false, false, false, Piece::Knight);
 								}
 
 								else if (currentPiece->piecetype == Piece::King && abs(currentPiece->index - target_index) == 2){
@@ -325,42 +325,52 @@ Piece* GetPieceClicked(Board* board, int mouseX, int mouseY){
 
 void Perft(Board* board, int depth){
 	for (int i=0; i<depth; i++){
-		printf("depth: %d, Perft: %d\n", i, CountPlySub(board, i));
+		printf("depth: %d, Perft: %d\n", i, CountPlySub(board, i, depth-1));
 	}
 }
 
-int CountPlySub(Board* board, int depth){
+int CountPlySub(Board* board, int depth, int maxDepth){
 	int moveCount = 0;
-
 	
 	if (depth == 0){
 		return 1;
 	}
 
-
 	else{
-		for (int i=0; i<board->size; i++){
+		/*
+		for (Move move : board->GetAllLegalMoves(board->color)){
+			board->MovePiece(move);
+
+			int _ = CountPlySub(board, depth-1, maxDepth);
+
+			moveCount += _;
+
+			board->UndoBoardMove();
+
+			if (depth == maxDepth){
+				move.Print();
+				printf("%d\n\n", _);
+			}
+		}
+		*/
+		for (int i=0; i<64; i++){
 			if (board->squares[i].color == board->color){
 				for (Move move : board->squares[i].GetFullyLegalMoves(board)){
 					board->MovePiece(move);
 
-					int _ = CountPlySub(board, depth-1);
+					int _ = CountPlySub(board, depth-1, maxDepth);
 
 					moveCount += _;
 
 					board->UndoBoardMove();
 
-					/*
-					if (depth == 3){
+					if (depth == maxDepth){
 						move.Print();
 						printf("%d\n\n", _);
 					}
-					*/
-					
 				}
 			}
 		}
-
 	}
 
 

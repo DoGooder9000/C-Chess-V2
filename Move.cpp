@@ -7,8 +7,8 @@ DoublePawnPush(DoublePawnPush), isEnPassant(isEnPassant), isCastle(false), Promo
 Move::Move(int start_index, int target_index, Piece* piece, bool DoublePawnPush, bool isEnPassant, bool isCastle) : start_index(start_index), target_index(target_index), piece(piece), 
 DoublePawnPush(DoublePawnPush), isEnPassant(isEnPassant), isCastle(isCastle), PromotionPieceType(Piece::None) {}
 
-Move::Move(int start_index, int target_index, Piece* piece, bool DoublePawnPush, bool isEnPassant, bool isCastle, int PromotionPieceType) : start_index(start_index), target_index(target_index), piece(piece), 
-DoublePawnPush(DoublePawnPush), isEnPassant(isEnPassant), isCastle(isCastle), PromotionPieceType(PromotionPieceType) {}
+Move::Move(int start_index, int target_index, Piece* piece, bool DoublePawnPush, bool isEnPassant, bool isCastle, int PromotionPieceType) : start_index(start_index), target_index(target_index), 
+piece(piece), DoublePawnPush(DoublePawnPush), isEnPassant(isEnPassant), isCastle(isCastle), PromotionPieceType(PromotionPieceType) {}
 
 Move::Move() : target_index(-1){}
 

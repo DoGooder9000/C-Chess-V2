@@ -315,7 +315,7 @@ void Board::MovePiece(Move move){
 	if (move.PromotionPieceType != Piece::None){
 		squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index);
 
-		squares[move.target_index] = Piece(move.PromotionPieceType, move.piece->color, move.target_index);
+		squares[move.target_index] = Piece(move.PromotionPieceType, start_color, move.target_index);
 		squares[move.target_index].moved = true;
 
 		GenerateBitboard(Piece::Pawn, move.piece->color);
@@ -410,13 +410,11 @@ void Board::PrintBitboard(Bitboard bitboard){
 }
 
 void Board::UndoBoardMove(){
-	if (HistoryIndex >= 0){
-		LoadPositionAtHistoryIndex(HistoryIndex);
+	LoadPositionAtHistoryIndex(HistoryIndex);
 
-		History[HistoryIndex] = UndoMove();
+	History[HistoryIndex] = UndoMove();
 
-		HistoryIndex--;
-	}
+	HistoryIndex--;
 }
 
 void Board::BoardBack(){
@@ -440,7 +438,6 @@ void Board::BoardForward(){
 void Board::LoadPositionAtHistoryIndex(int index){
 	squares = History[index].squares;
 	color = History[index].color;
-	castleRights = History[index].castleRights;
 
 	// Instead of saving the bitboards, you could just regenerate them, but that would take time.
 
@@ -453,7 +450,6 @@ void Board::LoadPositionAtHistoryIndex(int index){
 void Board::StorePositionAtHistoryIndex(int index){
 	History[index].color = color;
 	History[index].squares = squares;
-	History[index].castleRights = castleRights;
 	History[index].bitboards[0] = bitboards[0];
 	History[index].bitboards[1] = bitboards[1];
 	History[index].colorBitboards = colorBitboards;
