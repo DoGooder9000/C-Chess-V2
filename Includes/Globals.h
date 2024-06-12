@@ -25,7 +25,9 @@ typedef struct UndoMove{
 
 	std::array<Piece, 64> squares;
 
-	std::array<Bitboard, 6> bitboards[2];
+	std::array<int, 6> PieceCount[2];
+
+	std::array<int, 2> KingIndexes;
 
 	std::array<Bitboard, 2> colorBitboards;
 

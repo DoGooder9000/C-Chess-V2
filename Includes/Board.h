@@ -19,7 +19,8 @@ class Board{
 
 		std::array<Piece, size> squares;
 
-		std::array<Bitboard, 6> bitboards[2]; // All pieces of both colors
+		std::array<int, 2> KingIndexes;
+		std::array<int, 6> PieceCount[2]; // All pieces of both colors
 		std::array<Bitboard, 2> colorBitboards; // One for all pieces of the color
 
 		int DoublePawnPushIndex;
@@ -44,11 +45,9 @@ class Board{
 
 		void GenerateBitboards();
 		void GenerateColorBitboards();
-		void GenerateBitboard(int piecetype, int color);
 		static void PrintBitboard(Bitboard bitboard);
 
 		void GenerateSquaresToEdge();
-
 
 		void MovePiece(Move move);
 		void UndoBoardMove();

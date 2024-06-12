@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include "Includes/Bot.h"
 #include "Includes/Board.h"
 #include "Includes/Move.h"
 
@@ -87,7 +88,7 @@ int main(int argc, char* argv[]){
 	currentBoard = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 	currentBoard->color = 0;
 
-	Perft(currentBoard, 6);
+	Bot blackBot = Bot(Piece::Black, currentBoard);
 
 	currentPiece = nullptr;
 	
@@ -95,14 +96,13 @@ int main(int argc, char* argv[]){
 	SDL_Event event;
 	bool running = true;
 
-	while (running){
-		/*
-		if (currentBoard->color == 8){
-			std::list<Move> legalMoves = currentBoard->GetAllLegalMoves(currentBoard->color);
-			std::vector<Move> myVector(legalMoves.begin(), legalMoves.end());
-			currentBoard->MovePiece(myVector.at(0));
+	while (running){		
+		if (currentBoard->color == blackBot.color){
+			blackBot.board = currentBoard;
+			Move move = blackBot.GetMove(4);
+			currentBoard->MovePiece(move);
 		}
-		*/
+		
 
 		// Get events
 		if (SDL_PollEvent(&event)){
@@ -160,7 +160,7 @@ int main(int argc, char* argv[]){
 								}
 
 								else if(currentPiece->piecetype == Piece::Pawn && (target_index/8 == 7 || target_index/8 == 0)){
-									move = Move(currentPiece->index, target_index, currentPiece, false, false, false, Piece::Knight);
+									move = Move(currentPiece->index, target_index, currentPiece, false, false, false, Piece::Queen);
 								}
 
 								else if (currentPiece->piecetype == Piece::King && abs(currentPiece->index - target_index) == 2){
@@ -364,10 +364,12 @@ int CountPlySub(Board* board, int depth, int maxDepth){
 
 					board->UndoBoardMove();
 
+					/*
 					if (depth == maxDepth){
 						move.Print();
 						printf("%d\n\n", _);
 					}
+					*/
 				}
 			}
 		}

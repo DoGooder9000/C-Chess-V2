@@ -93,12 +93,14 @@ void Board::GetBoardFromFEN(const char* FEN_String){
 			
 			case 'k':
 				squares[square_index] = Piece(Piece::King, Piece::Black, square_index);
+				KingIndexes[1] = square_index;
 				fen_index++;
 				square_index++;
 				break;
 			
 			case 'K':
 				squares[square_index] = Piece(Piece::King, Piece::White, square_index);
+				KingIndexes[0] = square_index;
 				fen_index++;
 				square_index++;
 				break;
@@ -318,28 +320,29 @@ void Board::MovePiece(Move move){
 		squares[move.target_index] = Piece(move.PromotionPieceType, start_color, move.target_index);
 		squares[move.target_index].moved = true;
 
-		GenerateBitboard(Piece::Pawn, move.piece->color);
+		PieceCount[move.piece->color/8][Piece::Pawn]--; //Refresh Pawn Counts
 
-		GenerateBitboard(move.PromotionPieceType, move.piece->color);
-
-		GenerateBitboard(target_piecetype, target_color);
+		PieceCount[move.piece->color/8][move.PromotionPieceType-1]++; // Refresh Promotion Piece Counts
 	}
 
 	else{
+
 		squares[move.target_index] = *move.piece; // Set the target position on the board to the piece
 
 		squares[move.target_index].MoveSelf(move.target_index); // Move the piece // Say the piece moved
 
 		squares[move.start_index] = Piece(Piece::None, Piece::White, move.start_index); // Set the old position to blank
 
-		GenerateBitboard(start_piecetype, start_color); // Generate moved piece's bitboard
-
-		if (target_piecetype != Piece::None){
-			GenerateBitboard(target_piecetype, target_color); // Generate taken piece's bitboard
-		}
 	}
 
+	if (target_piecetype != Piece::None){
+		PieceCount[target_color/8][target_piecetype-1]--; // Refresh captured Piece's Count
+	}
+	if (move.piece->piecetype == Piece::King){
+		KingIndexes[move.piece->color/8] = move.target_index;
+	}
 
+	/**/
 	GenerateColorBitboards();
 	ChangeColor();
 }
@@ -354,16 +357,9 @@ int Board::OppositeColor(int color){
 }
 
 void Board::GenerateBitboards(){
-
-	for (int i=0; i<2; i++){
-		for (int j=0; j<6; j++){
-			bitboards[i][j] = 0ULL;
-
-			for (int k=0; k<size; k++){
-				if (squares[k].GetPieceID() == (i*8)+(j+1)){ // j+1 is neccesary because the Pawn ID starts at 1. 0 means type None
-					bitboards[i][j] |= (1ULL << k);
-				}
-			}
+	for (int k=0; k<64; k++){
+		if (squares[k].piecetype != Piece::None){
+			PieceCount[squares[k].color/8][squares[k].piecetype-1]++;
 		}
 	}
 }
@@ -380,16 +376,6 @@ void Board::GenerateColorBitboards(){
 			else{
 				colorBitboards[1] |= (1ULL << k);
 			}
-		}
-	}
-}
-
-void Board::GenerateBitboard(int piecetype, int color){
-	bitboards[color/8][piecetype-1] = 0ULL;
-
-	for (int k=0; k<size; k++){
-		if (squares[k].piecetype == piecetype && squares[k].color == color){ // j+1 is neccesary because the Pawn ID starts at 1. 0 means type None
-			bitboards[color/8][piecetype-1] |= (1ULL << k);
 		}
 	}
 }
@@ -441,8 +427,9 @@ void Board::LoadPositionAtHistoryIndex(int index){
 
 	// Instead of saving the bitboards, you could just regenerate them, but that would take time.
 
-	bitboards[0] = History[index].bitboards[0];
-	bitboards[1] = History[index].bitboards[1];
+	PieceCount[0] = History[index].PieceCount[0];
+	PieceCount[1] = History[index].PieceCount[1];
+	KingIndexes = History[index].KingIndexes;
 	colorBitboards = History[index].colorBitboards;
 	DoublePawnPushIndex = History[index].DoublePawnPushIndex;
 }
@@ -450,8 +437,9 @@ void Board::LoadPositionAtHistoryIndex(int index){
 void Board::StorePositionAtHistoryIndex(int index){
 	History[index].color = color;
 	History[index].squares = squares;
-	History[index].bitboards[0] = bitboards[0];
-	History[index].bitboards[1] = bitboards[1];
+	History[index].PieceCount[0] = PieceCount[0];
+	History[index].PieceCount[1] = PieceCount[1];
+	History[index].KingIndexes = KingIndexes;
 	History[index].colorBitboards = colorBitboards;
 	History[index].DoublePawnPushIndex = DoublePawnPushIndex;
 }
@@ -535,7 +523,7 @@ Bitboard Board::GetPieceAttackedSquares(Piece piece){
 }
 
 bool Board::KingChecked(int color){
-	return (bitboards[color/8][5] & GetAllAttackedSquares(OppositeColor(color)))>0;
+	return ((1ULL << KingIndexes[color/8]) & GetAllAttackedSquares(OppositeColor(color)))>0;
 }
 
 std::list<Move> Board::GetAllLegalMoves(int color){
